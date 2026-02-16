@@ -1,0 +1,36 @@
+:root {
+  --font-pixel: var(--ui-font-eng);
+  --app-bg:
+    radial-gradient(circle at 50% 50%, #151525 0%, #0e0e1a 60%, #08080f 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  position: relative;
+  background: var(--app-bg);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(90, 170, 42, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}

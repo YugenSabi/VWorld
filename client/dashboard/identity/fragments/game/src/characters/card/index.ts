@@ -1,0 +1,1 @@
+export { CharacterCardComponent } from './component';

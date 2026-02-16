@@ -1,0 +1,1 @@
+export { CharacterPanelComponent } from './component';
