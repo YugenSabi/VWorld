@@ -1,0 +1,50 @@
+.titleBar {
+  padding: 10px 0;
+  text-align: center;
+  background: #1a1a2e;
+  border-bottom: 2px solid #5a3a18;
+  position: relative;
+}
+
+.titleBar::before,
+.titleBar::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: #5aaa2a;
+  box-shadow: 10px 0 0 #3a7a1a, 20px 0 0 #5aaa2a;
+}
+
+.titleBar::before {
+  left: 16px;
+}
+
+.titleBar::after {
+  right: 16px;
+  box-shadow: -10px 0 0 #3a7a1a, -20px 0 0 #5aaa2a;
+}
+
+.title {
+  font-family: var(--font-pixel), monospace;
+  font-size: 1.2rem;
+  color: #ffe880;
+  letter-spacing: 6px;
+  text-shadow:
+    2px 2px 0 #2a1204,
+    0 0 10px rgba(255, 232, 128, 0.15);
+}
+
+@media (max-width: 700px) {
+  .title {
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+  }
+
+  .titleBar::before,
+  .titleBar::after {
+    display: none;
+  }
+}

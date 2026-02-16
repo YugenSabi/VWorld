@@ -1,0 +1,45 @@
+.panel {
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-family: var(--font-pixel), monospace;
+  font-size: 0.5rem;
+  color: #6a6a8a;
+  letter-spacing: 2px;
+  text-align: center;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #2a2a4a;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.addBtn {
+  padding: 8px;
+  background: #14142a;
+  border: 2px dashed #2a2a4a;
+  font-family: var(--font-pixel), monospace;
+  font-size: 0.4rem;
+  color: #4a4a6a;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.addBtn:not(:disabled):hover {
+  border-color: #5aaa2a;
+  color: #5aaa2a;
+  background: #1a1a2e;
+}
+
+.addBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
