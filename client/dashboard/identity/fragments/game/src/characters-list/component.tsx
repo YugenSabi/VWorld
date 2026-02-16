@@ -12,21 +12,19 @@ const mockCharacters = [
 export const CharacterPanelComponent = () => {
   const t = useTranslations('game.characters');
   return (
-    <Box as='aside' width={180} flexDirection='column' gap={8}>
-      <Text
-        as='div'
-        color='$textMuted'
-        font='$pixel'
-        style={{
-          fontSize: '0.5rem',
-          letterSpacing: '2px',
-          textAlign: 'center',
-          paddingBottom: 6,
-          borderBottom: '2px solid #2a2a4a',
-        }}
-      >
-        {t('title')}
-      </Text>
+    <Box as='aside' width={230} flexDirection='column' gap={8}>
+      <Box paddingBottom={6} borderBottom='2px solid #2a2a4a'>
+        <Text
+          as='div'
+          color='$textMuted'
+          font='$pixel'
+          fontSize='0.5rem'
+          letterSpacing='2px'
+          textAlign='center'
+        >
+          {t('title')}
+        </Text>
+      </Box>
 
       <Box flexDirection='column' gap={6}>
         {mockCharacters.map((character) => (

@@ -17,30 +17,19 @@ export const CharacterCardComponent = ({ name, mood }: CharacterCardProps) => {
       border='2px solid'
     >
       <Box
-        width={28}
-        height={28}
+        width={62}
+        height={62}
         flexShrink={0}
         backgroundColor='$border'
         borderColor='$borderLight'
         border='2px solid'
-        style={{ imageRendering: 'pixelated' }}
       />
 
-      <Box flexDirection='column' gap={3} minWidth={0}>
-        <Text
-          as='span'
-          color='$textGold'
-          font='$pixel'
-          style={{ fontSize: '0.67rem', letterSpacing: '0.5px' }}
-        >
+      <Box flexDirection='column' gap={10} minWidth={0}>
+        <Text as='span' color='$textGold' font='$pixel' fontSize='0.74rem' letterSpacing='0.5px'>
           {name}
         </Text>
-        <Text
-          as='span'
-          color='$accentGreen'
-          font='$pixel'
-          style={{ fontSize: '0.4rem', letterSpacing: '0.2px' }}
-        >
+        <Text as='span' color='$accentGreen' font='$pixel' fontSize='0.6rem' letterSpacing='0.2px'>
           {mood}
         </Text>
       </Box>

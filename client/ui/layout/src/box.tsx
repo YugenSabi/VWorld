@@ -23,16 +23,25 @@ export type BoxProps = Omit<HTMLAttributes<HTMLElement>, 'color'> & {
   pointerEvents?: CSSProperties['pointerEvents'];
   overflow?: CSSProperties['overflow'];
 
+  top?: CssSize;
+  left?: CssSize;
+  right?: CssSize;
+  bottom?: CssSize;
+
   width?: CssSize;
   height?: CssSize;
   minWidth?: CssSize;
   minHeight?: CssSize;
   maxWidth?: CssSize;
   maxHeight?: CssSize;
+  aspectRatio?: CSSProperties['aspectRatio'];
 
+  background?: CSSProperties['background'];
   backgroundColor?: ColorValue;
   color?: ColorValue;
   borderColor?: ColorValue;
+  boxShadow?: CSSProperties['boxShadow'];
+  cursor?: CSSProperties['cursor'];
 
   flexDirection?: CSSProperties['flexDirection'];
   alignItems?: CSSProperties['alignItems'];
@@ -57,6 +66,10 @@ export type BoxProps = Omit<HTMLAttributes<HTMLElement>, 'color'> & {
 
   borderRadius?: CssSize;
   border?: CSSProperties['border'];
+  borderTop?: CSSProperties['borderTop'];
+  borderBottom?: CSSProperties['borderBottom'];
+
+  transform?: CSSProperties['transform'];
 
   children?: ReactNode;
 };
@@ -69,15 +82,23 @@ export function Box({
   zIndex,
   pointerEvents,
   overflow,
+  top,
+  left,
+  right,
+  bottom,
   width,
   height,
   minWidth,
   minHeight,
   maxWidth,
   maxHeight,
+  aspectRatio,
+  background,
   backgroundColor,
   color,
   borderColor,
+  boxShadow,
+  cursor,
   flexDirection,
   alignItems,
   justifyContent,
@@ -98,6 +119,9 @@ export function Box({
   marginLeft,
   borderRadius,
   border,
+  borderTop,
+  borderBottom,
+  transform,
   style,
   ...props
 }: BoxProps) {
@@ -110,12 +134,25 @@ export function Box({
     pointerEvents,
     overflow,
 
+    top: toCssSize(top),
+    left: toCssSize(left),
+    right: toCssSize(right),
+    bottom: toCssSize(bottom),
+
     width: toCssSize(width),
     height: toCssSize(height),
     minWidth: toCssSize(minWidth),
     minHeight: toCssSize(minHeight),
     maxWidth: toCssSize(maxWidth),
     maxHeight: toCssSize(maxHeight),
+    aspectRatio,
+
+    background,
+    backgroundColor: cssVarColor(backgroundColor),
+    color: cssVarColor(color),
+    borderColor: cssVarColor(borderColor),
+    boxShadow,
+    cursor,
 
     flexDirection,
     alignItems,
@@ -140,10 +177,10 @@ export function Box({
 
     borderRadius: toCssSize(borderRadius),
     border,
-    borderColor: cssVarColor(borderColor),
+    borderTop,
+    borderBottom,
 
-    backgroundColor: cssVarColor(backgroundColor),
-    color: cssVarColor(color),
+    transform,
 
     ...style,
   };

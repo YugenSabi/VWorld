@@ -4,6 +4,7 @@
       "title": "VWORLD"
     },
     "toolbar": {
+      "title":"SETTINGS",
       "button1": "BUTTON 1",
       "button2": "BUTTON 2",
       "button3": "BUTTON 3",
@@ -12,7 +13,7 @@
     "viewport": {
       "locationName": "WHISPERING VILLAGE",
       "region": "REGION: NORTH FRONTIER",
-      "threat": "THREAT: LOW",
+      "weather": "WEATHER: SUNNY",
       "mapAlt": "VWorld village map"
     },
     "characters": {

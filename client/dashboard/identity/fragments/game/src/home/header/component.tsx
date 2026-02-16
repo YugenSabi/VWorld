@@ -11,9 +11,7 @@ export const HeaderComponent = () => {
       justifyContent='space-between'
       padding='10px 16px'
       backgroundColor='$panelBg'
-      style={{
-        borderBottom: '2px solid #5a3a18',
-      }}
+      borderBottom='2px solid #5a3a18'
     >
       <Box gap={4}>
         {dots.map((value) => (
@@ -30,11 +28,9 @@ export const HeaderComponent = () => {
         as='span'
         color='$textGold'
         font='$pixel'
-        style={{
-          fontSize: '1.2rem',
-          letterSpacing: '6px',
-          textShadow: '2px 2px 0 #2a1204, 0 0 10px rgba(255, 232, 128, 0.15)',
-        }}
+        fontSize='1.2rem'
+        letterSpacing='6px'
+        textShadow='2px 2px 0 #2a1204, 0 0 10px rgba(255, 232, 128, 0.15)'
       >
         VWORLD
       </Text>

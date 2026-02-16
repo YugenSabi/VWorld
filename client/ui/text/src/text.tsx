@@ -4,17 +4,35 @@ import { cssVarColor, cssVarFont, type ColorValue, type FontValue } from '@ui/th
 
 type TextTag = 'span' | 'div' | 'p' | 'label';
 
-export type TextProps = HTMLAttributes<HTMLElement> & {
+export type TextProps = Omit<HTMLAttributes<HTMLElement>, 'color'> & {
   as?: TextTag;
   color?: ColorValue;
   font?: FontValue;
+  fontSize?: CSSProperties['fontSize'];
+  letterSpacing?: CSSProperties['letterSpacing'];
+  textAlign?: CSSProperties['textAlign'];
+  textShadow?: CSSProperties['textShadow'];
   children?: ReactNode;
 };
 
-export function Text({ as = 'span', color, font, style, ...props }: TextProps) {
+export function Text({
+  as = 'span',
+  color,
+  font,
+  fontSize,
+  letterSpacing,
+  textAlign,
+  textShadow,
+  style,
+  ...props
+}: TextProps) {
   const nextStyle: CSSProperties = {
     color: cssVarColor(color),
     fontFamily: cssVarFont(font),
+    fontSize,
+    letterSpacing,
+    textAlign,
+    textShadow,
     ...style,
   };
 
