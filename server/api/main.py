@@ -2,9 +2,15 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from pathlib import Path
 
 from .database import init_db
-from .routers import (
+
+
+init_db()
+
+from .routers.api import (
     agents,
     memory,
     mood,
@@ -13,6 +19,7 @@ from .routers import (
     environment,
     llm_interaction,
 )
+from .routers.ws import points_router
 
 
 @asynccontextmanager
@@ -40,3 +47,13 @@ app.include_router(events.router)
 app.include_router(relationships.router)
 app.include_router(environment.router)
 app.include_router(llm_interaction.router)
+
+# WebSocket роутеры
+app.include_router(points_router)
+
+# Статический роут для тестовой страницы
+@app.get("/test")
+async def test_page():
+    """Возвращает тестовую HTML страницу"""
+    file_path = Path(__file__).parent / "test_front.html"
+    return FileResponse(file_path)

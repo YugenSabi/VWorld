@@ -75,3 +75,16 @@ class Environment(Base):
     weather = Column(String, default="sunny", nullable=False)
     time_speed = Column(Float, default=1.0, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class Point(Base):
+    """Модель для хранения точек на canvas."""
+    __tablename__ = "points"
+
+    id = Column(String, primary_key=True, index=True)  # point_id типа "point_0", "point_1"
+    x = Column(Float, nullable=False)
+    y = Column(Float, nullable=False)
+    target_x = Column(Float, nullable=False)
+    target_y = Column(Float, nullable=False)
+    speed = Column(Float, default=1.5, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

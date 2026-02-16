@@ -49,4 +49,3 @@ class AgentProfile(BaseModel):
     character: AgentProfileCharacter
     memories: list[MemoryResponse]
     relationships: list[RelationshipResponse]
-

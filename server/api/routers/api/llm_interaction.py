@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
-from ..database import get_db
-from ..database.crud_agents import get_agent
-from ..llm.agent_ai import summarize_memories
+from ...database import get_db
+from ...database.crud_agents import get_agent
+from ...llm.agent_ai import summarize_memories
 
 router = APIRouter(prefix="/agents/{agent_id}", tags=["llm"])
 

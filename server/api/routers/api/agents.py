@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from ..database import get_db
-from ..database.crud_agents import (
+from ...database import get_db
+from ...database.crud_agents import (
     get_agents,
     get_agent,
     create_agent,
@@ -12,10 +12,10 @@ from ..database.crud_agents import (
     delete_agent,
     get_agent_profile,
 )
-from ..database.crud_relationships import (
+from ...database.crud_relationships import (
     get_agent_relationships as get_rels,
 )
-from .. import models
+from ... import models
 
 
 router = APIRouter(prefix="/agents", tags=["agents"])

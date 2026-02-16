@@ -41,5 +41,3 @@ __all__ = [
     "TimeSpeedUpdate",
     "EnvironmentResponse",
 ]
-
-# All schemas are available directly from this module

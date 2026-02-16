@@ -2,6 +2,9 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 
+from .memory import MemoryResponse
+from .relationships import RelationshipResponse
+
 
 class AgentBase(BaseModel):
     #базовый класс для агента
@@ -44,5 +47,5 @@ class AgentProfile(BaseModel):
     #полный профиль агента с памятью и отношениями
     agent: AgentResponse
     character: AgentProfileCharacter
-    memories: list["MemoryResponse"]
-    relationships: list["RelationshipResponse"]
+    memories: list[MemoryResponse]
+    relationships: list[RelationshipResponse]

@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from ..database import get_db
-from ..database.crud_events import create_event
-from ..database.crud_environment import (
+from ...database import get_db
+from ...database.crud_events import create_event
+from ...database.crud_environment import (
     get_or_create_environment,
     update_weather as crud_update_weather,
     update_time_speed as crud_update_time_speed,
 )
-from .. import models
-from ..models.environment import WeatherUpdate, EnvironmentEventCreate, TimeSpeedUpdate
+from ... import models
+from ...models import WeatherUpdate, EnvironmentEventCreate, TimeSpeedUpdate
 
 router = APIRouter(prefix="/environment", tags=["environment"])
 

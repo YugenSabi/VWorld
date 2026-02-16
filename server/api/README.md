@@ -1,5 +1,7 @@
 # Структура API проекта
 
+**Памятка для фронтенда по WebSocket:** [websocket/README.md](websocket/README.md)
+
 ## Запуск с консоли из корня проекта
 
 
