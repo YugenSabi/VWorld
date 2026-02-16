@@ -2,8 +2,11 @@ import Image from 'next/image';
 import { Box } from '@ui/layout';
 import { Text } from '@ui/text';
 import worldMap from '@shared/images/world.gif';
+import { useTranslations } from 'next-intl';
 
 export const ViewportComponent = () => {
+  const t = useTranslations('game.viewport');
+
   return (
     <Box as='section' flexDirection='column'>
       <Box
@@ -12,23 +15,23 @@ export const ViewportComponent = () => {
         style={{
           gap: 10,
           padding: '8px 14px',
-          background: 'linear-gradient(180deg, #171b30 0%, #131728 100%)',
-          borderBottom: '2px solid #2a1204',
-          boxShadow: 'inset 0 -1px 0 #3a7a1a',
+          background: 'linear-gradient(180deg, var(--ui-color-infoBg, #171b30) 0%, var(--ui-color-infoBgDark, #131728) 100%)',
+          borderBottom: '2px solid var(--ui-color-borderBrown, #2a1204)',
+          boxShadow: 'inset 0 -1px 0 var(--ui-color-accentGreenDark, #3a7a1a)',
         }}
       >
         <Text
           as='p'
+          color='$textGold'
+          font='$pixel'
           style={{
             margin: 0,
-            fontFamily: 'var(--font-pixel), monospace',
-            fontSize: '0.55rem',
+            fontSize: '0.7rem',
             letterSpacing: '2px',
-            color: '#ffe880',
-            textShadow: '1px 1px 0 #2a1204',
+            textShadow: '1px 1px 0 var(--ui-color-borderBrown, #2a1204)',
           }}
         >
-          WHISPERING VILLAGE
+          {t('locationName')}
         </Text>
 
         <Box
@@ -37,13 +40,13 @@ export const ViewportComponent = () => {
           style={{
             gap: 14,
             fontFamily: 'var(--font-pixel), monospace',
-            fontSize: '0.4rem',
+            fontSize: '0.7rem',
             letterSpacing: '1px',
-            color: '#7fd54a',
+            color: 'var(--ui-color-accentGreenLight, #7fd54a)',
           }}
         >
-          <Text as='span'>REGION: NORTH FRONTIER</Text>
-          <Text as='span'>THREAT: LOW</Text>
+          <Text as='span'>{t('region')}</Text>
+          <Text as='span'>{t('threat')}</Text>
         </Box>
       </Box>
 
@@ -51,16 +54,16 @@ export const ViewportComponent = () => {
         as='div'
         position='relative'
         width='$full'
+        backgroundColor='$mapBg'
+        overflow='hidden'
         style={{
           aspectRatio: '4 / 3',
-          overflow: 'hidden',
-          background: '#1a3a0e',
           boxShadow: 'inset 0 0 40px rgba(0, 0, 0, 0.5)',
         }}
       >
         <Image
           src={worldMap}
-          alt='VWorld village map'
+          alt={t('mapAlt')}
           fill
           unoptimized
           draggable={false}

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
-import { delaGothicFont, underratedFont } from '@ui/theme/tokens/fonts.next';
+import { pressStart2PFont } from '@ui/theme/tokens/fonts.next';
+import { NextIntlClientProvider } from 'next-intl';
 import './globals.css';
+import messages from '../entrypoints/locales/ru.json';
 
 export const metadata: Metadata = {
   title: 'VWorld',
@@ -13,7 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ru'>
-      <body className={`${delaGothicFont.variable} ${underratedFont.variable}`}>{children}</body>
+    <body className={`${pressStart2PFont.variable}`}>
+    <NextIntlClientProvider locale='ru' messages={messages}>
+      {children}
+    </NextIntlClientProvider>
+    </body>
     </html>
   );
 }

@@ -1,49 +1,40 @@
 import { Box } from '@ui/layout';
-import { Button } from '@ui/button';
 import { Text } from '@ui/text';
+import { useTranslations } from 'next-intl';
 
-const buttons = [
-  { label: 'MAP', icon: '\u2302' },
-  { label: 'QUEST', icon: '\u2694' },
-  { label: 'ITEMS', icon: '\u2666' },
-  { label: 'CHAT', icon: '\u270E' },
-];
+const buttons = ['BUTTON 1', 'BUTTON 2', 'BUTTON 3', 'BUTTON 4'];
 
 export const ToolbarComponent = () => {
+  const t = useTranslations('game.toolbar');
   return (
     <Box as='aside' flexDirection='column' gap={6}>
-      {buttons.map((button) => (
-        <Button
-          key={button.label}
-          type='button'
-          variant='outline'
-          radius='sm'
-          font='$eng'
+      {buttons.map((label) => (
+        <Box
+          key={label}
+          width={200}
+          height={50}
+          alignItems='center'
+          justifyContent='center'
+          backgroundColor='$buttonBg'
+          borderColor='$border'
+          border='2px solid'
           style={{
-            width: 200,
-            height: 50,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            borderWidth: 2,
-            borderStyle: 'solid',
-            borderColor: '#2a2a4a',
-            background: 'linear-gradient(180deg, #1a1a34 0%, #14142a 100%)',
-            color: '#8a8aaa',
-            letterSpacing: '2px',
+            cursor: 'default',
+            opacity: 0.4,
           }}
         >
-          <Text as='span' style={{ fontFamily: 'var(--font-pixel), monospace', fontSize: '0.6rem', color: '#5aaa2a' }}>
-            {button.icon}
-          </Text>
           <Text
             as='span'
-            style={{ fontFamily: 'var(--font-pixel), monospace', fontSize: '0.7rem', color: '#8a8aaa', letterSpacing: '2px' }}
+            color='$accentGreenBright'
+            font='$pixel'
+            style={{
+              fontSize: '0.8rem',
+              letterSpacing: '1px',
+            }}
           >
-            {button.label}
+            {label}
           </Text>
-        </Button>
+        </Box>
       ))}
     </Box>
   );

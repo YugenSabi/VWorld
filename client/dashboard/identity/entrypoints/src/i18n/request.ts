@@ -1,11 +1,9 @@
 import { getRequestConfig } from 'next-intl/server';
 
-export default getRequestConfig(async ({ locale }) => {
-  const messages = (await import(`../../locales/${locale || 'ru'}.json`)).default;
-
+export default getRequestConfig(async () => {
   return {
-    locale: locale || 'ru',
-    messages,
+    locale: 'ru',
+    messages: (await import('../../locales/ru.json')).default,
     timeZone: 'UTC',
   };
 });

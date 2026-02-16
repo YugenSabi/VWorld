@@ -6,56 +6,42 @@ interface CharacterCardProps {
   mood: string;
 }
 
-const moodConfig: Record<string, { color: string; symbol: string }> = {
-  Friendly: { color: '#5aaa2a', symbol: '\u263A' },
-  Angry: { color: '#cc4444', symbol: '\u2620' },
-  Neutral: { color: '#6a6a8a', symbol: '\u25CB' },
-  Happy: { color: '#ffe880', symbol: '\u2605' },
-};
-
 export const CharacterCardComponent = ({ name, mood }: CharacterCardProps) => {
-  const moodState = moodConfig[mood] ?? moodConfig.Neutral;
-
   return (
     <Box
       alignItems='center'
-      style={{
-        gap: 8,
-        padding: 8,
-        background: '#1a1a2e',
-        border: '2px solid #2a2a4a',
-      }}
+      gap={8}
+      padding={8}
+      backgroundColor='$panelBg'
+      borderColor='$border'
+      border='2px solid'
     >
       <Box
-        width={30}
-        height={30}
-        alignItems='center'
-        justifyContent='center'
-        style={{
-          flexShrink: 0,
-          background: 'linear-gradient(135deg, #2a2a4a 0%, #1e1e3a 100%)',
-          border: '2px solid #3a3a5a',
-        }}
-      >
+        width={28}
+        height={28}
+        flexShrink={0}
+        backgroundColor='$border'
+        borderColor='$borderLight'
+        border='2px solid'
+        style={{ imageRendering: 'pixelated' }}
+      />
+
+      <Box flexDirection='column' gap={3} minWidth={0}>
         <Text
           as='span'
-          style={{
-            fontFamily: 'var(--font-pixel), monospace',
-            fontSize: '0.6rem',
-            color: '#5aaa2a',
-            lineHeight: 1,
-          }}
+          color='$textGold'
+          font='$pixel'
+          style={{ fontSize: '0.67rem', letterSpacing: '0.5px' }}
         >
-          {name[0]}
-        </Text>
-      </Box>
-
-      <Box flexDirection='column' style={{ gap: 3, minWidth: 0 }}>
-        <Text as='span' style={{ fontFamily: 'var(--font-pixel), monospace', fontSize: '0.6rem', color: '#ffe880' }}>
           {name}
         </Text>
-        <Text as='span' style={{ fontFamily: 'var(--font-pixel), monospace', fontSize: '0.4rem', color: moodState.color }}>
-          {moodState.symbol} {mood}
+        <Text
+          as='span'
+          color='$accentGreen'
+          font='$pixel'
+          style={{ fontSize: '0.4rem', letterSpacing: '0.2px' }}
+        >
+          {mood}
         </Text>
       </Box>
     </Box>

@@ -2,7 +2,7 @@ import { createElement, type CSSProperties, type HTMLAttributes, type ReactNode 
 
 import { cssVarColor, type ColorValue } from '@ui/theme';
 
-type BoxTag = 'div' | 'section' | 'main' | 'header' | 'footer';
+type BoxTag = 'div' | 'section' | 'main' | 'header' | 'footer' | 'aside';
 
 type SizeToken = '$full';
 type CssSize = number | string | SizeToken;

@@ -1,5 +1,5 @@
 :root {
-  --font-pixel: var(--ui-font-eng);
+  --font-pixel: var(--ui-font-pixel);
   --app-bg:
     radial-gradient(circle at 50% 50%, #151525 0%, #0e0e1a 60%, #08080f 100%);
 }

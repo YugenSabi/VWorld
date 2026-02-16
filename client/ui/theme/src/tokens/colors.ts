@@ -1,11 +1,25 @@
 export type ColorTokenName =
   | 'bg'
-  | 'base'
-  | 'primaryText'
-  | 'secondaryText'
-  | 'mainCardBg'
-  | 'cardBg'
+  | 'bgLight'
+  | 'bgDark'
+  | 'panelBg'
   | 'buttonBg'
+  | 'infoBg'
+  | 'infoBgDark'
+  | 'mapBg'
+  | 'border'
+  | 'borderLight'
+  | 'borderBrown'
+  | 'borderBrownLight'
+  | 'accentGreen'
+  | 'accentGreenDark'
+  | 'accentGreenLight'
+  | 'accentGreenBright'
+  | 'statusGreen'
+  | 'statusGreenDark'
+  | 'statusBorder'
+  | 'textGold'
+  | 'textMuted'
   | 'error'
   | 'errorText';
 
@@ -13,13 +27,27 @@ export type ColorToken = `$${ColorTokenName}`;
 export type ColorValue = ColorToken | (string & {});
 
 const COLOR_FALLBACKS: Record<ColorTokenName, string> = {
-  bg: '#F4F3E7',
-  mainCardBg: '#AEA7A333',
-  cardBg: '#D7CEC1',
-  base: '#000000',
-  primaryText: '#8B8177',
-  secondaryText: '#2B2520CC',
-  buttonBg: '#2B2520CC',
+  bg: '#0e0e1a',
+  bgLight: '#151525',
+  bgDark: '#08080f',
+  panelBg: '#1a1a2e',
+  buttonBg: '#14142a',
+  infoBg: '#171b30',
+  infoBgDark: '#131728',
+  mapBg: '#1a3a0e',
+  border: '#2a2a4a',
+  borderLight: '#3a3a5a',
+  borderBrown: '#2a1204',
+  borderBrownLight: '#5a3a18',
+  accentGreen: '#5aaa2a',
+  accentGreenDark: '#3a7a1a',
+  accentGreenLight: '#7fd54a',
+  accentGreenBright: '#05f711',
+  statusGreen: '#3a6820',
+  statusGreenDark: '#2d4a1a',
+  statusBorder: '#4a8a28',
+  textGold: '#ffe880',
+  textMuted: '#6a6a8a',
   error: '#DC3545',
   errorText: '#DC3545',
 };

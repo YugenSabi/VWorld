@@ -1,0 +1,22 @@
+{
+  "game": {
+    "header": {
+      "title": "VWORLD"
+    },
+    "toolbar": {
+      "button1": "BUTTON 1",
+      "button2": "BUTTON 2",
+      "button3": "BUTTON 3",
+      "button4": "BUTTON 4"
+    },
+    "viewport": {
+      "locationName": "WHISPERING VILLAGE",
+      "region": "REGION: NORTH FRONTIER",
+      "threat": "THREAT: LOW",
+      "mapAlt": "VWorld village map"
+    },
+    "characters": {
+      "title": "CHARACTERS"
+    }
+  }
+}

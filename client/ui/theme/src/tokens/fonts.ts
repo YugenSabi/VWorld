@@ -1,4 +1,4 @@
-export type FontTokenName = 'rus' | 'eng';
+export type FontTokenName = 'rus' | 'eng' | 'pixel';
 export type FontToken = `$${FontTokenName}`;
 export type FontValue = FontToken | (string & {});
 
