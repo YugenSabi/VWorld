@@ -1,1 +1,1 @@
-export { CharacterPanel } from "./ui/CharacterPanel";
+export { CharacterPanel } from "./src/CharacterPanel";

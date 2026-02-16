@@ -1,1 +1,1 @@
-export { HomeScreen } from "./ui/HomeScreen";
+export { HomeScreen } from "./src/HomeScreen";

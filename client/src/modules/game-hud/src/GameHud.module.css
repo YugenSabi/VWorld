@@ -1,0 +1,28 @@
+.hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px;
+  background: #14142a;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  font-family: var(--font-pixel), monospace;
+  font-size: 0.4rem;
+  color: #6a6a8a;
+  letter-spacing: 1px;
+}
+
+.value {
+  font-family: var(--font-pixel), monospace;
+  font-size: 0.5rem;
+  color: #5aaa2a;
+  letter-spacing: 1px;
+}
