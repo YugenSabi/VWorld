@@ -1,4 +1,9 @@
 {
+  "home": {
+    "title": "VWORLD",
+    "subtitle": "ENTER THE WORLD",
+    "play": "PLAY"
+  },
   "game": {
     "header": {
       "title": "VWORLD"

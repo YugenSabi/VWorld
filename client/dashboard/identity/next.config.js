@@ -8,7 +8,7 @@ const nextConfig = {
   experimental: {
     externalDir: true,
   },
-  transpilePackages: ['@ui/layout', '@ui/text', '@ui/theme', '@ui/button', '@identity/game'],
+  transpilePackages: ['@ui/layout', '@ui/text', '@ui/theme', '@ui/button', '@identity/game', '@identity/home'],
   webpack(config) {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),

@@ -1,0 +1,14 @@
+{
+  "name": "@identity/home",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}

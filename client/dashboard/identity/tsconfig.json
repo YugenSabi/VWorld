@@ -32,6 +32,8 @@
       "@ui/button/*": ["../../ui/button/src/*"],
       "@ui/icons": ["../../ui/icons/src"],
       "@ui/icons/*": ["../../ui/icons/src/*"],
+      "@identity/game": ["./fragments/game/src"],
+      "@identity/home": ["./fragments/home/src"],
       "@dashboard/identity/entrypoints/*": ["./entrypoints/src/*"],
       "@lib/*": ["./lib/*"]
     }
