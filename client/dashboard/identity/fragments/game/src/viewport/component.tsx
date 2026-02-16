@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { Box } from '@ui/layout';
 import { Text } from '@ui/text';
-import worldMap from '@shared/images/world.gif';
+import worldMap from '@shared/images/Fontain.gif';
 import { useTranslations } from 'next-intl';
 import { PlayerComponent } from '../player';
 
@@ -17,7 +17,7 @@ export const ViewportComponent = () => {
         padding='8px 14px'
         background='linear-gradient(180deg, var(--ui-color-infoBg, #171b30) 0%, var(--ui-color-infoBgDark, #131728) 100%)'
         borderBottom='2px solid var(--ui-color-borderBrown, #2a1204)'
-        boxShadow='inset 0 -1px 0 var(--ui-color-accentGreenDark, #3a7a1a)'
+        boxShadow='inset 0 -2px 0 var(--ui-color-accentGreenDark, #3a7a1a)'
       >
         <Text
           as='div'
@@ -45,7 +45,7 @@ export const ViewportComponent = () => {
         width='$full'
         backgroundColor='$mapBg'
         overflow='hidden'
-        aspectRatio='4 / 3'
+        aspectRatio='5.5 / 3'
         boxShadow='inset 0 0 40px rgba(0, 0, 0, 0.5)'
       >
         <Image

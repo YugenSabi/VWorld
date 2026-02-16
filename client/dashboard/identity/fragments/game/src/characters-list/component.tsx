@@ -18,7 +18,7 @@ export const CharacterPanelComponent = () => {
           as='div'
           color='$textMuted'
           font='$pixel'
-          fontSize='0.5rem'
+          fontSize='0.7rem'
           letterSpacing='2px'
           textAlign='center'
         >

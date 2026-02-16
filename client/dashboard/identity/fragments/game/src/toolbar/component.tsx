@@ -3,7 +3,7 @@ import { Text } from '@ui/text';
 import { Button } from '@ui/button';
 import { useTranslations } from 'next-intl';
 
-const buttons = ['BUTTON 1', 'BUTTON 2', 'BUTTON 3', 'BUTTON 4'];
+const buttons = ['WEATHER', 'ENTITIES', 'ENEMIES'];
 
 export const ToolbarComponent = () => {
   const t = useTranslations('game.toolbar');
@@ -14,7 +14,7 @@ export const ToolbarComponent = () => {
           as='div'
           color='$textMuted'
           font='$pixel'
-          fontSize='0.5rem'
+          fontSize='0.7rem'
           letterSpacing='2px'
           textAlign='center'
         >
@@ -34,7 +34,7 @@ export const ToolbarComponent = () => {
             textColor='$textGold'
             bg='$buttonBg'
             borderColor='$border'
-            disabled
+
           >
             {label}
           </Button>
