@@ -90,8 +90,6 @@ export const CharacterPanelComponent = ({ locationId }: CharacterPanelProps) => 
               key={agent.id}
               name={agent.name}
               mood={agent.mood}
-              avatarUrl={agent.avatarUrl}
-              level={agent.level}
             />
           ))}
 

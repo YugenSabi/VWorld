@@ -13,17 +13,16 @@ export const AgentSchema = z.object({
   id: z.string(),
   name: z.string().min(1, 'Name is required'),
   mood: AgentMoodSchema,
-  avatarUrl: z.string().url().optional().or(z.literal('')),
-  level: z.number().int().min(1).max(100).optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  personality: z.string(),
+  current_plan: z.number().int().min(1).max(100).optional(),
+  created_at: z.string().datetime(),
 });
 
 export const AgentCreateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   mood: AgentMoodSchema.default('Neutral'),
-  avatarUrl: z.string().url().optional(),
-  level: z.number().int().min(1).max(100).optional(),
+  personality: z.string(),
+  created_at: z.string().datetime(),
 });
 
 export const AgentUpdateSchema = AgentCreateSchema.partial();

@@ -11,16 +11,17 @@ export const WeatherTypeSchema = z.enum([
 
 export const WeatherUpdateSchema = z.object({
   weather: WeatherTypeSchema,
+  speed: z.number().min(0).max(10)
 });
 
 export const TimeSpeedUpdateSchema = z.object({
+  weather: WeatherTypeSchema,
   speed: z.number().min(0).max(10),
 });
 
 export const EnvironmentResponseSchema = z.object({
   weather: WeatherTypeSchema,
   speed: z.number(),
-  updatedAt: z.string().datetime(),
 });
 
 export type WeatherType = z.infer<typeof WeatherTypeSchema>;
