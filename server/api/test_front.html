@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Перемещение точек</title>
+</head>
+<body>
+    <div id="status">Отключено</div>
+    <button id="connectBtn">Подключиться</button>
+    <button id="addPointBtn" disabled>Добавить точку</button>
+    <button id="disconnectBtn" disabled>Отключиться</button>
+    <div id="canvas" style="width: 800px; height: 600px; border: 1px solid black; position: relative;"></div>
+
+    <script>
+        let ws = null;
+        let points = {};
+        const canvas = document.getElementById('canvas');
+        const statusDiv = document.getElementById('status');
+        const connectBtn = document.getElementById('connectBtn');
+        const addPointBtn = document.getElementById('addPointBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+
+        // Определяем URL WebSocket
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/points`;
+
+        function updateStatus(connected) {
+            if (connected) {
+                statusDiv.textContent = 'Подключено';
+                connectBtn.disabled = true;
+                addPointBtn.disabled = false;
+                disconnectBtn.disabled = false;
+            } else {
+                statusDiv.textContent = 'Отключено';
+                connectBtn.disabled = false;
+                addPointBtn.disabled = true;
+                disconnectBtn.disabled = true;
+            }
+        }
+
+        function connect() {
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log('WebSocket подключен');
+                updateStatus(true);
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                
+                if (message.type === 'points_update') {
+                    updatePoints(message.points);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket ошибка:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket отключен');
+                updateStatus(false);
+                // Очищаем точки при отключении
+                points = {};
+                renderPoints();
+            };
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        function addPoint() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const rect = canvas.getBoundingClientRect();
+                ws.send(JSON.stringify({
+                    type: 'add_point',
+                    screen_width: rect.width,
+                    screen_height: rect.height
+                }));
+            }
+        }
+
+        function updatePoints(pointsData) {
+            points = {};
+            pointsData.forEach(pointData => {
+                points[pointData.id] = pointData;
+            });
+            renderPoints();
+        }
+
+        function renderPoints() {
+            canvas.innerHTML = '';
+            Object.values(points).forEach(point => {
+                const pointElement = document.createElement('div');
+                pointElement.id = point.id;
+                pointElement.style.position = 'absolute';
+                pointElement.style.width = '10px';
+                pointElement.style.height = '10px';
+                pointElement.style.backgroundColor = 'red';
+                pointElement.style.left = `${point.x}px`;
+                pointElement.style.top = `${point.y}px`;
+                canvas.appendChild(pointElement);
+            });
+        }
+
+        // Обработчик клика на canvas для перемещения точки
+        canvas.addEventListener('click', (e) => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                // Находим ближайшую точку
+                let closestPoint = null;
+                let minDistance = Infinity;
+
+                Object.values(points).forEach(point => {
+                    const dx = point.x - x;
+                    const dy = point.y - y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < minDistance && distance < 50) { // 50px радиус выбора
+                        minDistance = distance;
+                        closestPoint = point;
+                    }
+                });
+
+                // Если нашли точку, перемещаем её
+                if (closestPoint) {
+                    ws.send(JSON.stringify({
+                        type: 'move_point',
+                        point_id: closestPoint.id,
+                        x: x,
+                        y: y
+                    }));
+                } else {
+                    // Если кликнули не на точку, перемещаем все точки туда
+                    Object.values(points).forEach(point => {
+                        ws.send(JSON.stringify({
+                            type: 'move_point',
+                            point_id: point.id,
+                            x: x,
+                            y: y
+                        }));
+                    });
+                }
+            }
+        });
+
+        // Обработчики кнопок
+        connectBtn.addEventListener('click', connect);
+        addPointBtn.addEventListener('click', addPoint);
+        disconnectBtn.addEventListener('click', disconnect);
+
+        // Автоматическое подключение при загрузке страницы
+        window.addEventListener('load', () => {
+            connect();
+        });
+    </script>
+</body>
+</html>
