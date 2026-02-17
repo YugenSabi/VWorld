@@ -72,5 +72,5 @@ def init_db():
 
 
 def get_db():
-    #возвращает генератор сессий
-    return _db_instance.get_session()
+    #исправила генератор сессий
+    yield from _db_instance.get_session()
