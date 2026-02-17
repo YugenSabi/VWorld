@@ -98,6 +98,10 @@ class ConnectionManager:
             finally:
                 db.close()
     
+    def reload_from_db(self):
+        """Reload points from DB (called when agents are created/deleted)."""
+        self._load_points_from_db()
+
     async def broadcast_points(self):
         #отправляет текущее состояние всех точек всем подключенным клиентам (без speed)
         if not self.active_connections:

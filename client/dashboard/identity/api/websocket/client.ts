@@ -7,6 +7,8 @@ export type WebSocketEventType =
   | 'agent_deleted'
   | 'agent_moved'
   | 'agent_mood_changed'
+  | 'agent_thought'
+  | 'agent_dialogue'
   | 'environment_update'
   | 'weather_changed'
   | 'time_updated'

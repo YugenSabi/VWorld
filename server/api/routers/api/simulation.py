@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
 from ...database import get_db
+from ...database.crud_environment import get_or_create_environment, update_time_speed as crud_update_time_speed
 from ...llm.simulation import get_simulation
 
 router = APIRouter(prefix="/simulation", tags=["simulation"])
@@ -13,18 +14,18 @@ class SpeedRequest(BaseModel):
 
 
 @router.post("/start")
-async def start_simulation():
-    """Запускает автономный game loop."""
+async def start_simulation(db: Session = Depends(get_db)):
     sim = get_simulation()
+    env = get_or_create_environment(db)
+    sim.set_speed(env.time_speed)
     if sim.is_running:
-        return {"status": "already_running"}
+        return {"status": "already_running", "speed": env.time_speed}
     await sim.start()
-    return {"status": "started"}
+    return {"status": "started", "speed": env.time_speed}
 
 
 @router.post("/stop")
 async def stop_simulation():
-    """Останавливает game loop."""
     sim = get_simulation()
     if not sim.is_running:
         return {"status": "not_running"}
@@ -34,7 +35,6 @@ async def stop_simulation():
 
 @router.get("/status")
 def simulation_status():
-    """Возвращает статус и последние результаты симуляции."""
     sim = get_simulation()
     return {
         "running": sim.is_running,
@@ -43,8 +43,8 @@ def simulation_status():
 
 
 @router.post("/speed")
-def set_simulation_speed(request: SpeedRequest):
-    """Устанавливает скорость симуляции."""
+def set_simulation_speed(request: SpeedRequest, db: Session = Depends(get_db)):
+    env = crud_update_time_speed(db, request.speed)
     sim = get_simulation()
-    sim.set_speed(request.speed)
-    return {"speed": request.speed}
+    sim.set_speed(env.time_speed)
+    return {"speed": env.time_speed, "running": sim.is_running}

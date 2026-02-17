@@ -30,10 +30,28 @@ class AgentUpdate(BaseModel):
 class AgentResponse(AgentBase):
     #возвращает данные агента
     id: int
+    x: float = 50.0
+    y: float = 50.0
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+    @classmethod
+    def from_agent(cls, agent) -> "AgentResponse":
+        """Create response with position from linked Point."""
+        x = agent.point.x if agent.point else 50.0
+        y = agent.point.y if agent.point else 50.0
+        return cls(
+            id=agent.id,
+            name=agent.name,
+            personality=agent.personality,
+            mood=agent.mood,
+            current_plan=agent.current_plan,
+            x=x,
+            y=y,
+            created_at=agent.created_at,
+        )
 
 
 class AgentProfileCharacter(BaseModel):

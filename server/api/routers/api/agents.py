@@ -29,17 +29,28 @@ def get_agent_or_404(agent_id: int, db: DBSession):
     return agent
 
 
-@router.get("", response_model=list[models.AgentResponse])
+def _reload_points_manager():
+    """Notify points manager to reload from DB."""
+    try:
+        from ...routers.ws.points import manager
+        manager.reload_from_db()
+    except Exception:
+        pass
+
+
+@router.get("")
 def list_agents(db: DBSession, skip: int = 0, limit: int = 100):
-    return get_agents(db, skip=skip, limit=limit)
+    agents = get_agents(db, skip=skip, limit=limit)
+    return [models.AgentResponse.from_agent(a) for a in agents]
 
 
-@router.get("/{agent_id}", response_model=models.AgentResponse)
-def get_agent_by_id(agent=Depends(get_agent_or_404)):
-    return agent
+@router.get("/{agent_id}")
+def get_agent_by_id(agent_id: int, db: DBSession):
+    agent = get_agent_or_404(agent_id, db)
+    return models.AgentResponse.from_agent(agent)
 
 
-@router.post("", response_model=models.AgentResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 def create_new_agent(
     agent_data: models.AgentCreate,
     db: DBSession,
@@ -47,12 +58,14 @@ def create_new_agent(
 ):
     created = create_agent(db, agent_data)
     create_event(db, models.EventCreate(content=f"Agent added: {created.name}"))
+    # Reload points manager so it picks up the new agent point
+    _reload_points_manager()
     background_tasks.add_task(agents_hub.send_agent_created, created)
     background_tasks.add_task(agents_hub.send_agents_update)
-    return created
+    return models.AgentResponse.from_agent(created)
 
 
-@router.patch("/{agent_id}", response_model=models.AgentResponse)
+@router.patch("/{agent_id}")
 def update_agent_by_id(
     agent_id: int,
     agent_data: models.AgentUpdate,
@@ -64,7 +77,7 @@ def update_agent_by_id(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Agent not found")
 
     background_tasks.add_task(agents_hub.send_agents_update)
-    return updated
+    return models.AgentResponse.from_agent(updated)
 
 
 @router.delete("/{agent_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -81,6 +94,8 @@ def delete_agent_by_id(
     if deleted:
         create_event(db, models.EventCreate(content=f"Agent removed: {existing.name}"))
 
+    # Reload points manager so deleted point is removed
+    _reload_points_manager()
     background_tasks.add_task(agents_hub.send_agent_deleted, agent_id)
     background_tasks.add_task(agents_hub.send_agents_update)
     return None

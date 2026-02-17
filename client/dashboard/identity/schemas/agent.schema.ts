@@ -8,6 +8,8 @@ export const AgentSchema = z.object({
   mood: z.string(),
   personality: z.string().default(''),
   current_plan: z.string().default(''),
+  x: z.number().default(50),
+  y: z.number().default(50),
   created_at: z.string(),
 });
 

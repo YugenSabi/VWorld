@@ -15,8 +15,10 @@ class Agent(Base):
     personality = Column(String, default="")
     mood = Column(String, default="neutral")
     current_plan = Column(String, default="")
+    point_id = Column(String, ForeignKey("points.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    point = relationship("Point", lazy="joined")
     memories = relationship("Memory", back_populates="agent", cascade="all, delete-orphan")
     relationships_from = relationship(
         "Relationship",

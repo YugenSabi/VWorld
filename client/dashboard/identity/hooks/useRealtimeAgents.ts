@@ -26,12 +26,27 @@ interface AgentMoodChangedData {
   mood: string;
 }
 
+interface AgentThoughtData {
+  agentId: number;
+  thought: string;
+}
+
+interface AgentDialogueData {
+  agentId1: number;
+  name1: string;
+  agentId2: number;
+  name2: string;
+  messages: { speaker: string; text: string }[];
+}
+
 interface UseRealtimeAgentsOptions {
   onAgentsUpdate?: (agents: Agent[]) => void;
   onAgentCreated?: (agent: Agent) => void;
   onAgentDeleted?: (agentId: number) => void;
   onAgentMoved?: (agentId: number, x: number, y: number) => void;
   onAgentMoodChanged?: (agentId: number, mood: string) => void;
+  onAgentThought?: (agentId: number, thought: string) => void;
+  onAgentDialogue?: (data: AgentDialogueData) => void;
   enabled?: boolean;
 }
 
@@ -42,6 +57,8 @@ export function useRealtimeAgents(options: UseRealtimeAgentsOptions = {}) {
     onAgentDeleted,
     onAgentMoved,
     onAgentMoodChanged,
+    onAgentThought,
+    onAgentDialogue,
     enabled = true,
   } = options;
 
@@ -90,9 +107,29 @@ export function useRealtimeAgents(options: UseRealtimeAgentsOptions = {}) {
     [onAgentMoodChanged]
   );
 
+  const handleAgentThought = useCallback(
+    (data: AgentThoughtData) => {
+      if (onAgentThought) {
+        onAgentThought(data.agentId, data.thought);
+      }
+    },
+    [onAgentThought]
+  );
+
+  const handleAgentDialogue = useCallback(
+    (data: AgentDialogueData) => {
+      if (onAgentDialogue) {
+        onAgentDialogue(data);
+      }
+    },
+    [onAgentDialogue]
+  );
+
   useWebSocketEvent(WS_ENDPOINTS.agents, 'agents_update', handleAgentsUpdate, enabled);
   useWebSocketEvent(WS_ENDPOINTS.agents, 'agent_created', handleAgentCreated, enabled);
   useWebSocketEvent(WS_ENDPOINTS.agents, 'agent_deleted', handleAgentDeleted, enabled);
   useWebSocketEvent(WS_ENDPOINTS.agents, 'agent_moved', handleAgentMoved, enabled);
   useWebSocketEvent(WS_ENDPOINTS.agents, 'agent_mood_changed', handleAgentMoodChanged, enabled);
+  useWebSocketEvent(WS_ENDPOINTS.agents, 'agent_thought', handleAgentThought, enabled);
+  useWebSocketEvent(WS_ENDPOINTS.agents, 'agent_dialogue', handleAgentDialogue, enabled);
 }

@@ -40,7 +40,7 @@ class AgentsHub:
         try:
             agents = get_agents(db, skip=0, limit=1000)
             serialized = [
-                models.AgentResponse.model_validate(agent).model_dump(mode="json")
+                models.AgentResponse.from_agent(agent).model_dump(mode="json")
                 for agent in agents
             ]
         finally:
@@ -49,7 +49,7 @@ class AgentsHub:
         await self.broadcast("agents_update", {"agents": serialized})
 
     async def send_agent_created(self, agent: Any) -> None:
-        serialized = models.AgentResponse.model_validate(agent).model_dump(mode="json")
+        serialized = models.AgentResponse.from_agent(agent).model_dump(mode="json")
         await self.broadcast("agent_created", {"agent": serialized})
 
     async def send_agent_deleted(self, agent_id: int) -> None:
@@ -57,6 +57,26 @@ class AgentsHub:
 
     async def send_agent_mood_changed(self, agent_id: int, mood: str) -> None:
         await self.broadcast("agent_mood_changed", {"agentId": agent_id, "mood": mood})
+
+    async def send_agent_moved(self, agent_id: int, x: float, y: float) -> None:
+        await self.broadcast("agent_moved", {"agentId": agent_id, "x": x, "y": y})
+
+    async def send_agent_dialogue(
+        self,
+        agent_id1: int, name1: str,
+        agent_id2: int, name2: str,
+        messages: list[dict],
+    ) -> None:
+        await self.broadcast("agent_dialogue", {
+            "agentId1": agent_id1,
+            "name1": name1,
+            "agentId2": agent_id2,
+            "name2": name2,
+            "messages": messages,
+        })
+
+    async def send_agent_thought(self, agent_id: int, thought: str) -> None:
+        await self.broadcast("agent_thought", {"agentId": agent_id, "thought": thought})
 
 
 agents_hub = AgentsHub()
