@@ -12,26 +12,26 @@ interface AgentCreatedData {
 }
 
 interface AgentDeletedData {
-  agentId: string;
+  agentId: number;
 }
 
 interface AgentMovedData {
-  agentId: string;
+  agentId: number;
   x: number;
   y: number;
 }
 
 interface AgentMoodChangedData {
-  agentId: string;
+  agentId: number;
   mood: string;
 }
 
 interface UseRealtimeAgentsOptions {
   onAgentsUpdate?: (agents: Agent[]) => void;
   onAgentCreated?: (agent: Agent) => void;
-  onAgentDeleted?: (agentId: string) => void;
-  onAgentMoved?: (agentId: string, x: number, y: number) => void;
-  onAgentMoodChanged?: (agentId: string, mood: string) => void;
+  onAgentDeleted?: (agentId: number) => void;
+  onAgentMoved?: (agentId: number, x: number, y: number) => void;
+  onAgentMoodChanged?: (agentId: number, mood: string) => void;
   enabled?: boolean;
 }
 

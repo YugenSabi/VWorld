@@ -56,13 +56,13 @@ export function useAgents(
         error,
       }));
     }
-  }, [params]);
+  }, []);
 
   useEffect(() => {
     if (options.autoFetch) {
       fetchAgents();
     }
-  }, [fetchAgents, options.autoFetch]);
+  }, []);
 
   return {
     ...state,
@@ -118,7 +118,7 @@ export function useAgentById(agentId: string | null): {
 
   useEffect(() => {
     fetchAgent();
-  }, [fetchAgent]);
+  }, [agentId]);
 
   return {
     ...state,

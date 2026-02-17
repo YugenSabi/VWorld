@@ -1,44 +1,33 @@
 import { z } from 'zod';
 
-export const AgentMoodSchema = z.enum([
-  'Friendly',
-  'Angry',
-  'Neutral',
-  'Sad',
-  'Happy',
-  'Aggressive',
-]);
+export const AgentMoodSchema = z.string();
 
 export const AgentSchema = z.object({
-  id: z.string(),
+  id: z.number().int(),
   name: z.string().min(1, 'Name is required'),
-  mood: AgentMoodSchema,
-  personality: z.string(),
-  current_plan: z.number().int().min(1).max(100).optional(),
-  created_at: z.string().datetime(),
+  mood: z.string(),
+  personality: z.string().default(''),
+  current_plan: z.string().default(''),
+  created_at: z.string(),
 });
 
 export const AgentCreateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
-  mood: AgentMoodSchema.default('Neutral'),
-  personality: z.string(),
-  created_at: z.string().datetime(),
+  mood: z.string().default('neutral'),
+  personality: z.string().default(''),
+  current_plan: z.string().default(''),
 });
 
 export const AgentUpdateSchema = AgentCreateSchema.partial();
 
 export const GetAgentsParamsSchema = z.object({
-  page: z.number().int().min(1).optional(),
+  skip: z.number().int().min(0).optional(),
   limit: z.number().int().min(1).max(100).optional(),
-  sortBy: z.enum(['createdAt', 'name', 'level']).optional(),
-  sortOrder: z.enum(['asc', 'desc']).optional(),
 });
 
 export const GetAgentsResponseSchema = z.object({
   agents: z.array(AgentSchema),
   total: z.number().int(),
-  page: z.number().int().optional(),
-  limit: z.number().int().optional(),
 });
 
 export const GetAgentByIdResponseSchema = z.object({

@@ -16,10 +16,7 @@ interface CharacterPanelProps {
 export const CharacterPanelComponent = ({ locationId }: CharacterPanelProps) => {
   const t = useTranslations('game.characters');
 
-  const { agents: apiAgents, isLoading, error } = useAgents({
-    sortBy: 'createdAt',
-    sortOrder: 'desc',
-  });
+  const { agents: apiAgents, isLoading, error } = useAgents();
 
   const initialAgents = USE_MOCK_AGENTS ? MOCK_AGENTS : apiAgents;
 
@@ -37,13 +34,13 @@ export const CharacterPanelComponent = ({ locationId }: CharacterPanelProps) => 
     setAgents((prev) => [...prev, newAgent]);
   }, []);
 
-  const handleAgentDeleted = useCallback((agentId: string) => {
+  const handleAgentDeleted = useCallback((agentId: number) => {
     setAgents((prev) => prev.filter((agent) => agent.id !== agentId));
   }, []);
 
-  const handleAgentMoodChanged = useCallback((agentId: string, mood: string) => {
+  const handleAgentMoodChanged = useCallback((agentId: number, mood: string) => {
     setAgents((prev) =>
-      prev.map((agent) => (agent.id === agentId ? { ...agent, mood: mood as any } : agent))
+      prev.map((agent) => (agent.id === agentId ? { ...agent, mood } : agent))
     );
   }, []);
 
