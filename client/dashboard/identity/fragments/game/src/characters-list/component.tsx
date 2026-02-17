@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Box } from '@ui/layout';
 import { Text } from '@ui/text';
 import { CharacterCardComponent } from './card';
@@ -11,13 +11,18 @@ import type { Agent } from '@/schemas';
 
 interface CharacterPanelProps {
   locationId?: string;
+  refreshSignal?: number;
+  deletedAgentId?: number | null;
 }
 
-export const CharacterPanelComponent = ({ locationId }: CharacterPanelProps) => {
+export const CharacterPanelComponent = ({
+  locationId,
+  refreshSignal = 0,
+  deletedAgentId = null,
+}: CharacterPanelProps) => {
   const t = useTranslations('game.characters');
 
-  const { agents: apiAgents, isLoading, error } = useAgents();
-
+  const { agents: apiAgents, isLoading, error, refetch } = useAgents();
   const initialAgents = USE_MOCK_AGENTS ? MOCK_AGENTS : apiAgents;
 
   const [agents, setAgents] = useState<Agent[]>(initialAgents);
@@ -26,23 +31,40 @@ export const CharacterPanelComponent = ({ locationId }: CharacterPanelProps) => 
     setAgents(initialAgents);
   }, [initialAgents]);
 
-  const handleAgentsUpdate = useCallback((updatedAgents: Agent[]) => {
+  useEffect(() => {
+    if (!USE_MOCK_AGENTS && refreshSignal > 0) {
+      refetch();
+    }
+  }, [refreshSignal, refetch]);
+
+  useEffect(() => {
+    if (deletedAgentId !== null) {
+      setAgents((prev) => prev.filter((agent) => agent.id !== deletedAgentId));
+    }
+  }, [deletedAgentId]);
+
+  const handleAgentsUpdate = (updatedAgents: Agent[]) => {
     setAgents(updatedAgents);
-  }, []);
+  };
 
-  const handleAgentCreated = useCallback((newAgent: Agent) => {
-    setAgents((prev) => [...prev, newAgent]);
-  }, []);
+  const handleAgentCreated = (newAgent: Agent) => {
+    setAgents((prev) => {
+      if (prev.some((agent) => agent.id === newAgent.id)) {
+        return prev;
+      }
+      return [...prev, newAgent];
+    });
+  };
 
-  const handleAgentDeleted = useCallback((agentId: number) => {
+  const handleAgentDeleted = (agentId: number) => {
     setAgents((prev) => prev.filter((agent) => agent.id !== agentId));
-  }, []);
+  };
 
-  const handleAgentMoodChanged = useCallback((agentId: number, mood: string) => {
+  const handleAgentMoodChanged = (agentId: number, mood: string) => {
     setAgents((prev) =>
       prev.map((agent) => (agent.id === agentId ? { ...agent, mood } : agent))
     );
-  }, []);
+  };
 
   useRealtimeAgents({
     onAgentsUpdate: handleAgentsUpdate,
@@ -54,7 +76,7 @@ export const CharacterPanelComponent = ({ locationId }: CharacterPanelProps) => 
 
   return (
     <Box as='aside' width={210} flexDirection='column' gap={8}>
-      <Box paddingBottom={6}  borderBottom='2px solid #2a2a4a'>
+      <Box paddingBottom={6} borderBottom='2px solid #2a2a4a'>
         <Text
           as='span'
           color='$textMuted'

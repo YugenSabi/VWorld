@@ -42,7 +42,7 @@ export class WebSocketClient {
   }
 
   connect(): void {
-    if (this.ws?.readyState === WebSocket.OPEN) {
+    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
       console.warn('[WS] Already connected');
       return;
     }
@@ -53,6 +53,7 @@ export class WebSocketClient {
     this.ws.onopen = () => {
       console.log('[WS] Connected to', this.config.url);
       this.reconnectAttempts = 0;
+      this.handleMessage({ type: 'connection_open', data: null });
     };
 
     this.ws.onmessage = (event) => {
@@ -66,10 +67,12 @@ export class WebSocketClient {
 
     this.ws.onerror = (error) => {
       console.error('[WS] Error:', error);
+      this.handleMessage({ type: 'connection_error', data: null });
     };
 
     this.ws.onclose = () => {
       console.log('[WS] Disconnected');
+      this.handleMessage({ type: 'connection_close', data: null });
       this.ws = null;
 
       if (!this.isIntentionallyClosed) {

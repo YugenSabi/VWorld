@@ -1,22 +1,20 @@
 import { z } from 'zod';
 
 export const WeatherTypeSchema = z.enum([
-  'Sunny',
-  'Rainy',
-  'Cloudy',
-  'Snowy',
-  'Foggy',
-  'Stormy',
+  'sunny',
+  'rainy',
+  'cloudy',
+  'snowy',
+  'foggy',
+  'stormy',
 ]);
 
 export const WeatherUpdateSchema = z.object({
   weather: WeatherTypeSchema,
-  speed: z.number().min(0).max(10)
 });
 
 export const TimeSpeedUpdateSchema = z.object({
-  weather: WeatherTypeSchema,
-  speed: z.number().min(0).max(10),
+  speed: z.number().min(0.1).max(10),
 });
 
 export const EnvironmentResponseSchema = z.object({

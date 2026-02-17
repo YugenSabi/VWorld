@@ -1,12 +1,39 @@
+'use client';
+
 import Image from 'next/image';
 import { Box } from '@ui/layout';
 import { Text } from '@ui/text';
 import worldMap from '@shared/images/Fontain.gif';
 import { useTranslations } from 'next-intl';
+import type { WeatherType } from '../../../../schemas';
 import { PlayerComponent } from '../player';
+import { RainOverlay } from './rain';
+import { SnowOverlay } from './snow';
 
-export const ViewportComponent = () => {
+type ViewportProps = {
+  weather: WeatherType;
+};
+
+export const ViewportComponent = ({ weather }: ViewportProps) => {
   const t = useTranslations('game.viewport');
+
+  const weatherLabel = (() => {
+    switch (weather) {
+      case 'rainy':
+        return t('weatherValues.rainy');
+      case 'cloudy':
+        return t('weatherValues.cloudy');
+      case 'snowy':
+        return t('weatherValues.snowy');
+      case 'foggy':
+        return t('weatherValues.foggy');
+      case 'stormy':
+        return t('weatherValues.stormy');
+      case 'sunny':
+      default:
+        return t('weatherValues.sunny');
+    }
+  })();
 
   return (
     <Box as='section' flexDirection='column'>
@@ -35,7 +62,7 @@ export const ViewportComponent = () => {
             {t('region')}
           </Text>
           <Text as='span' color='$accentGreenLight' font='$pixel' fontSize='0.7rem' letterSpacing='1px'>
-            {t('weather')}
+            {`${t('weatherPrefix')}: ${weatherLabel}`}
           </Text>
         </Box>
       </Box>
@@ -56,6 +83,9 @@ export const ViewportComponent = () => {
           draggable={false}
           style={{ objectFit: 'cover', imageRendering: 'pixelated' }}
         />
+
+        {weather === 'rainy' && <RainOverlay />}
+        {weather === 'snowy' && <SnowOverlay />}
         <PlayerComponent />
       </Box>
     </Box>

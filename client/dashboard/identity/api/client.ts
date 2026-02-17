@@ -41,16 +41,21 @@ function buildUrlWithParams(url: string, params?: Record<string, string | number
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
+  if (response.status === 204 || response.status === 205) {
+    return undefined as T;
+  }
+
   const contentType = response.headers.get('content-type');
   const isJson = contentType?.includes('application/json');
 
-  const data = isJson ? await response.json() : await response.text();
+  const text = await response.text();
+  const data = isJson && text ? JSON.parse(text) : text;
 
   if (response.ok) {
     return data as T;
   }
 
-  const errorData = isJson ? (data as ApiError) : { message: data as string };
+  const errorData = isJson ? (data as ApiError) : { message: (data as string) || 'Request failed' };
   throw new ApiClientError(
     errorData.message || 'Unknown error occurred',
     response.status,

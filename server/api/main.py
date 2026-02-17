@@ -19,7 +19,7 @@ from .routers.api import (
     environment,
     llm_interaction,
 )
-from .routers.ws import points_router
+from .routers.ws import points_router, agents_router
 
 
 @asynccontextmanager
@@ -50,6 +50,7 @@ app.include_router(llm_interaction.router)
 
 # WebSocket роутеры
 app.include_router(points_router)
+app.include_router(agents_router)
 
 # Статический роут для тестовой страницы
 @app.get("/test")
