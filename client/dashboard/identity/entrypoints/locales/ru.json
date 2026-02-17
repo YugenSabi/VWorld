@@ -13,12 +13,42 @@
       "button1": "BUTTON 1",
       "button2": "BUTTON 2",
       "button3": "BUTTON 3",
-      "button4": "BUTTON 4"
+      "button4": "BUTTON 4",
+      "createPlaceholder": "Hero name",
+      "createButton": "ADD HERO",
+      "createSubmitting": "ADDING...",
+      "createEmptyError": "Enter hero name",
+      "createLengthError": "Name is too long",
+      "createUnknownError": "Failed to create hero",
+      "entitiesLoading": "Loading entities...",
+      "entitiesEmpty": "No entities",
+      "entitiesLoadError": "Failed to load entities",
+      "deleteButton": "DELETE",
+      "deleteSubmitting": "DELETING...",
+      "deleteUnknownError": "Failed to delete hero"
     },
     "viewport": {
       "locationName": "WHISPERING VILLAGE",
       "region": "REGION: NORTH FRONTIER",
       "weather": "WEATHER: SUNNY",
+      "weatherPrefix": "WEATHER",
+      "weatherLoading": "LOADING",
+      "weatherUpdating": "UPDATING",
+      "weatherMenuTitle": "WEATHER MODE",
+      "availableSoon": "SOON",
+      "weatherOptions": {
+        "rainy": "RAIN",
+        "snowy": "SNOW",
+        "stormy": "STORM"
+      },
+      "weatherValues": {
+        "sunny": "SUNNY",
+        "rainy": "RAINY",
+        "cloudy": "CLOUDY",
+        "snowy": "SNOWY",
+        "foggy": "FOGGY",
+        "stormy": "STORMY"
+      },
       "mapAlt": "VWorld village map"
     },
     "characters": {

@@ -13,6 +13,10 @@ const nextConfig = {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       '@shared': path.resolve(__dirname, '../../shared'),
+      '@/api': path.resolve(__dirname, './api'),
+      '@/schemas': path.resolve(__dirname, './schemas'),
+      '@/hooks': path.resolve(__dirname, './hooks'),
+      '@/mocks': path.resolve(__dirname, './mocks'),
     };
 
     const svgrRule = {

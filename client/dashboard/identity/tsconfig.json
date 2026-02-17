@@ -1,43 +1,45 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
     "baseUrl": ".",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
-      "@/*": ["./app/*"],
-      "@shared/*": ["../../shared/*"],
-      "@ui/layout": ["../../ui/layout/src"],
-      "@ui/layout/*": ["../../ui/layout/src/*"],
-      "@ui/text": ["../../ui/text/src"],
-      "@ui/text/*": ["../../ui/text/src/*"],
-      "@ui/theme": ["../../ui/theme/src"],
-      "@ui/theme/*": ["../../ui/theme/src/*"],
-      "@ui/button": ["../../ui/button/src"],
-      "@ui/button/*": ["../../ui/button/src/*"],
-      "@ui/icons": ["../../ui/icons/src"],
-      "@ui/icons/*": ["../../ui/icons/src/*"],
-      "@identity/game": ["./fragments/game/src"],
-      "@identity/home": ["./fragments/home/src"],
-      "@dashboard/identity/entrypoints/*": ["./entrypoints/src/*"],
-      "@lib/*": ["./lib/*"]
-    }
+      "@/*": [
+        "./*"
+      ],
+      "@/api": [
+        "./api"
+      ],
+      "@/api/*": [
+        "./api/*"
+      ],
+      "@/schemas": [
+        "./schemas"
+      ],
+      "@/schemas/*": [
+        "./schemas/*"
+      ],
+      "@/hooks": [
+        "./hooks"
+      ],
+      "@/hooks/*": [
+        "./hooks/*"
+      ],
+      "@/mocks": [
+        "./mocks"
+      ],
+      "@/mocks/*": [
+        "./mocks/*"
+      ]
+    },
+    "jsx": "preserve"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
