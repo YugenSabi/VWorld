@@ -2,7 +2,31 @@
 
 import { useState, useEffect } from 'react';
 import { Box } from '@ui/layout';
-import { type PlayerData, mockPlayer } from './interface';
+
+interface PlayerPosition {
+  x: number;
+  y: number;
+}
+
+interface PlayerData {
+  id: string;
+  name: string;
+  position: PlayerPosition;
+  size: number;
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const mockPlayer: PlayerData = {
+  id: 'player-1',
+  name: 'Player',
+  position: { x: 50, y: 50 },
+  size: 24,
+  color: 'var(--ui-color-accentGreen, #5aaa2a)',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+};
 
 interface PlayerComponentProps {
   data?: PlayerData;
