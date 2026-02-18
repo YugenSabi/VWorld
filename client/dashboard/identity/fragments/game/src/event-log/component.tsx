@@ -16,10 +16,11 @@ interface EventLogProps {
 }
 
 export const EventLogComponent = ({ logs }: EventLogProps) => {
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [logs.length]);
 
   return (
@@ -44,13 +45,10 @@ export const EventLogComponent = ({ logs }: EventLogProps) => {
         <Text as='span' color='$textMuted' font='$pixel' fontSize='0.5rem'>{logs.length} events</Text>
       </Box>
 
-      <Box
+      <div
         className='event-log-scroll'
-        flexDirection='column'
-        padding='12px 14px'
-        gap={10}
-        overflow='auto'
-        flexGrow={1}
+        ref={scrollRef}
+        style={{ display: 'flex', flexDirection: 'column', padding: '12px 14px', gap: 10, overflow: 'auto', flexGrow: 1 }}
       >
         {logs.length === 0 && (
           <Text as='div' color='$textMuted' font='$pixel' fontSize='0.55rem'>
@@ -89,8 +87,7 @@ export const EventLogComponent = ({ logs }: EventLogProps) => {
             </Text>
           </Box>
         ))}
-        <div ref={bottomRef} />
-      </Box>
+      </div>
     </Box>
   );
 };

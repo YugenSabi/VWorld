@@ -1,10 +1,14 @@
-from .agents import (
+﻿from .agents import (
     AgentBase,
     AgentCreate,
     AgentUpdate,
     AgentResponse,
     AgentProfileCharacter,
     AgentProfile,
+    AgentPreset,
+    AgentPresetSpawnRequest,
+    MobPreset,
+    MobPresetSpawnRequest,
 )
 from .memory import MemoryCreate, MemoryResponse, MemoryWithSummary
 from .events import EventCreate, EventResponse
@@ -25,6 +29,10 @@ __all__ = [
     "AgentResponse",
     "AgentProfileCharacter",
     "AgentProfile",
+    "AgentPreset",
+    "AgentPresetSpawnRequest",
+    "MobPreset",
+    "MobPresetSpawnRequest",
     "MemoryCreate",
     "MemoryResponse",
     "MemoryWithSummary",

@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -10,8 +10,10 @@ from fastapi.responses import FileResponse
 from .database import init_db
 from .database.database import SessionLocal
 from .database.crud_environment import get_environment
+from .database.crud_events import create_event, get_events
 from .llm.simulation import get_simulation
 from .websocket.ws_logic import points_update_task
+from . import models
 
 
 init_db()
@@ -41,6 +43,12 @@ async def lifespan(app: FastAPI):
     try:
         env = get_environment(db)
         sim.set_speed(env.time_speed)
+        existing_events = get_events(db, limit=1)
+        if not existing_events:
+            create_event(
+                db,
+                models.EventCreate(content=f"Начало дня: мир запущен, базовая погода {env.weather}."),
+            )
     finally:
         db.close()
 

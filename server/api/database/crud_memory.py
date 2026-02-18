@@ -1,4 +1,4 @@
-from typing import Optional
+﻿from typing import Optional
 from sqlalchemy.orm import Session
 
 from .models import Memory, Agent
@@ -6,7 +6,6 @@ from .. import models
 
 
 def add_memory(db: Session, agent_id: int, memory: models.MemoryCreate) -> Optional[Memory]:
-    #добавляет память для конкретного агента
     db_agent = db.query(Agent).filter(Agent.id == agent_id).first()
     if not db_agent:
         return None
@@ -18,5 +17,4 @@ def add_memory(db: Session, agent_id: int, memory: models.MemoryCreate) -> Optio
 
 
 def get_memories(db: Session, agent_id: int) -> list[Memory]:
-    #возвращает все память для конкретного агента
     return db.query(Memory).filter(Memory.agent_id == agent_id).order_by(Memory.created_at.desc()).all()

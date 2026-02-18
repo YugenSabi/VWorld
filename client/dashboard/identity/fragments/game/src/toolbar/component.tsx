@@ -5,10 +5,9 @@ import { Box } from '@ui/layout';
 import { Text } from '@ui/text';
 import { Button } from '@ui/button';
 import { agentsService } from '@/api';
-import type { Agent, WeatherType } from '../../../../schemas';
+import type { Agent, AgentPreset, MobPreset, WeatherType } from '../../../../schemas';
 import { useTranslations } from 'next-intl';
 
-const buttons = ['ENEMIES'] as const;
 const weatherOptions: WeatherType[] = ['sunny', 'rainy', 'snowy'];
 
 type ToolbarProps = {
@@ -49,14 +48,21 @@ export const ToolbarComponent = ({
 
   const [isWeatherMenuOpen, setIsWeatherMenuOpen] = useState(false);
   const [isEntityMenuOpen, setIsEntityMenuOpen] = useState(false);
+  const [isMobMenuOpen, setIsMobMenuOpen] = useState(false);
   const [isUpdatingWeather, setIsUpdatingWeather] = useState(false);
-  const [isCreatingAgent, setIsCreatingAgent] = useState(false);
+  const [isSpawningPreset, setIsSpawningPreset] = useState(false);
+  const [isSpawningMob, setIsSpawningMob] = useState(false);
   const [isLoadingAgents, setIsLoadingAgents] = useState(false);
+  const [isLoadingPresets, setIsLoadingPresets] = useState(false);
+  const [isLoadingMobs, setIsLoadingMobs] = useState(false);
   const [deletingAgentId, setDeletingAgentId] = useState<number | null>(null);
-  const [newAgentName, setNewAgentName] = useState('');
-  const [createAgentError, setCreateAgentError] = useState<string | null>(null);
+  const [spawningPresetId, setSpawningPresetId] = useState<string | null>(null);
+  const [spawningMobId, setSpawningMobId] = useState<string | null>(null);
   const [entityError, setEntityError] = useState<string | null>(null);
+  const [mobError, setMobError] = useState<string | null>(null);
   const [entityAgents, setEntityAgents] = useState<Agent[]>([]);
+  const [agentPresets, setAgentPresets] = useState<AgentPreset[]>([]);
+  const [mobPresets, setMobPresets] = useState<MobPreset[]>([]);
 
   useEffect(() => {
     if (!isEntityMenuOpen) {
@@ -65,19 +71,46 @@ export const ToolbarComponent = ({
 
     const loadAgents = async () => {
       setIsLoadingAgents(true);
+      setIsLoadingPresets(true);
       setEntityError(null);
       try {
-        const response = await agentsService.getAgents();
-        setEntityAgents(response.agents);
+        const [agentsResponse, presetsResponse] = await Promise.all([
+          agentsService.getAgents(),
+          agentsService.getAgentPresets(weather),
+        ]);
+        setEntityAgents(agentsResponse.agents);
+        setAgentPresets(presetsResponse.presets);
       } catch (error) {
         setEntityError(error instanceof Error ? error.message : tToolbar('entitiesLoadError'));
       } finally {
         setIsLoadingAgents(false);
+        setIsLoadingPresets(false);
       }
     };
 
     loadAgents();
-  }, [isEntityMenuOpen, tToolbar]);
+  }, [isEntityMenuOpen, tToolbar, weather]);
+
+  useEffect(() => {
+    if (!isMobMenuOpen) {
+      return;
+    }
+
+    const loadMobs = async () => {
+      setIsLoadingMobs(true);
+      setMobError(null);
+      try {
+        const presets = await agentsService.getMobPresets();
+        setMobPresets(presets);
+      } catch (error) {
+        setMobError(error instanceof Error ? error.message : 'Failed to load mobs');
+      } finally {
+        setIsLoadingMobs(false);
+      }
+    };
+
+    loadMobs();
+  }, [isMobMenuOpen]);
 
   const handleSelectWeather = async (nextWeather: WeatherType) => {
     if (nextWeather === weather || isUpdatingWeather) {
@@ -94,42 +127,43 @@ export const ToolbarComponent = ({
     }
   };
 
-  const handleCreateAgent = async () => {
-    const name = newAgentName.trim();
-    if (!name) {
-      setCreateAgentError(tToolbar('createEmptyError'));
-      return;
-    }
-
-    if (name.length > 100) {
-      setCreateAgentError(tToolbar('createLengthError'));
-      return;
-    }
-
-    setCreateAgentError(null);
+  const handleSpawnPreset = async (presetId: string) => {
     setEntityError(null);
-    setIsCreatingAgent(true);
+    setIsSpawningPreset(true);
+    setSpawningPresetId(presetId);
 
     try {
-      const response = await agentsService.createAgent({
-        name,
-        mood: 'neutral',
-        personality: '',
-        current_plan: '',
-      });
-
+      const response = await agentsService.spawnFromPreset(presetId);
       setEntityAgents((prev) => [...prev, response.agent]);
-      setNewAgentName('');
       onAgentCreated();
     } catch (error) {
-      setCreateAgentError(error instanceof Error ? error.message : tToolbar('createUnknownError'));
+      setEntityError(error instanceof Error ? error.message : tToolbar('presetSpawnError'));
     } finally {
-      setIsCreatingAgent(false);
+      setIsSpawningPreset(false);
+      setSpawningPresetId(null);
+    }
+  };
+
+  const handleSpawnMob = async (presetId: string) => {
+    setMobError(null);
+    setIsSpawningMob(true);
+    setSpawningMobId(presetId);
+
+    try {
+      const response = await agentsService.spawnMob(presetId);
+      setEntityAgents((prev) => [...prev, response.agent]);
+      onAgentCreated();
+    } catch (error) {
+      setMobError(error instanceof Error ? error.message : tToolbar('mobSpawnError'));
+    } finally {
+      setIsSpawningMob(false);
+      setSpawningMobId(null);
     }
   };
 
   const handleDeleteAgent = async (agentId: number) => {
     setEntityError(null);
+    setMobError(null);
     setDeletingAgentId(agentId);
     try {
       await agentsService.deleteAgent(String(agentId));
@@ -141,6 +175,9 @@ export const ToolbarComponent = ({
       setDeletingAgentId(null);
     }
   };
+
+  const agentEntities = entityAgents.filter((a) => (a.type || 'agent') === 'agent');
+  const mobEntities = entityAgents.filter((a) => a.type === 'mob');
 
   return (
     <Box as='aside' width={180} flexDirection='column' gap={8}>
@@ -220,45 +257,46 @@ export const ToolbarComponent = ({
 
           {isEntityMenuOpen && (
             <Box flexDirection='column' gap={6} padding={6} background='rgba(18, 25, 42, 0.9)' border='1px solid #2a1204'>
-              <input
-                value={newAgentName}
-                onChange={(e) => setNewAgentName(e.target.value)}
-                placeholder={tToolbar('createPlaceholder')}
-                maxLength={100}
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  height: 34,
-                  padding: '6px 8px',
-                  border: '1px solid #5a3a18',
-                  background: '#11192a',
-                  color: '#f4d88d',
-                  fontFamily: 'var(--ui-font-pixel, monospace)',
-                  fontSize: '12px',
-                }}
-              />
-
-              <Button
-                fullWidth
-                size='sm'
-                variant='outline'
-                radius='sm'
-                font='$pixel'
-                fontSize='0.7rem'
-                textColor='$textGold'
-                bg='$buttonBg'
-                borderColor='$border'
-                onClick={handleCreateAgent}
-                disabled={isCreatingAgent}
-              >
-                {isCreatingAgent ? tToolbar('createSubmitting') : tToolbar('createButton')}
-              </Button>
-
-              {createAgentError && (
-                <Text as='div' color='$error' font='$pixel' fontSize='0.58rem'>
-                  {createAgentError}
+              <Box borderBottom='1px solid #2a2a4a' paddingBottom={6} flexDirection='column' gap={6}>
+                <Text as='div' color='$textMuted' font='$pixel' fontSize='0.58rem'>
+                  {tToolbar('presetsTitle')}
                 </Text>
-              )}
+                {isLoadingPresets && (
+                  <Text as='div' color='$textMuted' font='$pixel' fontSize='0.58rem'>
+                    {tToolbar('presetsLoading')}
+                  </Text>
+                )}
+
+                {!isLoadingPresets && agentPresets.length === 0 && (
+                  <Text as='div' color='$textMuted' font='$pixel' fontSize='0.58rem'>
+                    {tToolbar('presetsEmpty')}
+                  </Text>
+                )}
+
+                {!isLoadingPresets && agentPresets.map((preset) => (
+                  <Box key={preset.id} alignItems='center' justifyContent='space-between' gap={6}>
+                    <Text as='span' color='$textGold' font='$pixel' fontSize='0.62rem'>
+                      {preset.name}
+                    </Text>
+                    <Button
+                      size='sm'
+                      variant='outline'
+                      radius='sm'
+                      font='$pixel'
+                      fontSize='0.58rem'
+                      textColor='$textGold'
+                      bg='$buttonBg'
+                      borderColor='$border'
+                      onClick={() => handleSpawnPreset(preset.id)}
+                      disabled={isSpawningPreset && spawningPresetId === preset.id}
+                    >
+                      {isSpawningPreset && spawningPresetId === preset.id
+                        ? tToolbar('presetSpawnSubmitting')
+                        : tToolbar('presetSpawnButton')}
+                    </Button>
+                  </Box>
+                ))}
+              </Box>
 
               <Box borderTop='1px solid #2a2a4a' paddingTop={6} flexDirection='column' gap={6}>
                 {isLoadingAgents && (
@@ -267,13 +305,13 @@ export const ToolbarComponent = ({
                   </Text>
                 )}
 
-                {!isLoadingAgents && entityAgents.length === 0 && (
+                {!isLoadingAgents && agentEntities.length === 0 && (
                   <Text as='div' color='$textMuted' font='$pixel' fontSize='0.58rem'>
                     {tToolbar('entitiesEmpty')}
                   </Text>
                 )}
 
-                {!isLoadingAgents && entityAgents.map((agent) => (
+                {!isLoadingAgents && agentEntities.map((agent) => (
                   <Box key={agent.id} alignItems='center' justifyContent='space-between' gap={6}>
                     <Text as='span' color='$textGold' font='$pixel' fontSize='0.62rem'>
                       {agent.name}
@@ -305,9 +343,8 @@ export const ToolbarComponent = ({
           )}
         </Box>
 
-        {buttons.map((label) => (
+        <Box flexDirection='column' gap={6}>
           <Button
-            key={label}
             fullWidth
             size='lg'
             variant='outline'
@@ -317,10 +354,88 @@ export const ToolbarComponent = ({
             textColor='$textGold'
             bg='$buttonBg'
             borderColor='$border'
+            onClick={() => setIsMobMenuOpen((prev) => !prev)}
           >
-            {label}
+            MOBS
           </Button>
-        ))}
+
+          {isMobMenuOpen && (
+            <Box flexDirection='column' gap={6} padding={6} background='rgba(18, 25, 42, 0.9)' border='1px solid #2a1204'>
+              <Box borderBottom='1px solid #2a2a4a' paddingBottom={6} flexDirection='column' gap={6}>
+                <Text as='div' color='$textMuted' font='$pixel' fontSize='0.58rem'>
+                  {tToolbar('mobsPresetsTitle')}
+                </Text>
+                {isLoadingMobs && (
+                  <Text as='div' color='$textMuted' font='$pixel' fontSize='0.58rem'>
+                    {tToolbar('mobsLoading')}
+                  </Text>
+                )}
+
+                {!isLoadingMobs && mobPresets.length === 0 && (
+                  <Text as='div' color='$textMuted' font='$pixel' fontSize='0.58rem'>
+                    {tToolbar('mobsEmpty')}
+                  </Text>
+                )}
+
+                {!isLoadingMobs && mobPresets.map((preset) => (
+                  <Box key={preset.id} alignItems='center' justifyContent='space-between' gap={6}>
+                    <Text as='span' color='$textGold' font='$pixel' fontSize='0.62rem'>
+                      {preset.name}
+                    </Text>
+                    <Button
+                      size='sm'
+                      variant='outline'
+                      radius='sm'
+                      font='$pixel'
+                      fontSize='0.58rem'
+                      textColor='$textGold'
+                      bg='$buttonBg'
+                      borderColor='$border'
+                      onClick={() => handleSpawnMob(preset.id)}
+                      disabled={isSpawningMob && spawningMobId === preset.id}
+                    >
+                      {isSpawningMob && spawningMobId === preset.id
+                        ? tToolbar('mobSpawnSubmitting')
+                        : tToolbar('mobSpawnButton')}
+                    </Button>
+                  </Box>
+                ))}
+              </Box>
+
+              {mobEntities.length > 0 && (
+                <Box borderTop='1px solid #2a2a4a' paddingTop={6} flexDirection='column' gap={6}>
+                  {mobEntities.map((mob) => (
+                    <Box key={mob.id} alignItems='center' justifyContent='space-between' gap={6}>
+                      <Text as='span' color='$textGold' font='$pixel' fontSize='0.62rem'>
+                        {mob.name}
+                      </Text>
+                      <Button
+                        size='sm'
+                        variant='outline'
+                        radius='sm'
+                        font='$pixel'
+                        fontSize='0.58rem'
+                        textColor='$textGold'
+                        bg='$buttonBg'
+                        borderColor='$border'
+                        onClick={() => handleDeleteAgent(mob.id)}
+                        disabled={deletingAgentId === mob.id}
+                      >
+                        {deletingAgentId === mob.id ? tToolbar('deleteSubmitting') : tToolbar('deleteButton')}
+                      </Button>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+
+              {mobError && (
+                <Text as='div' color='$error' font='$pixel' fontSize='0.58rem'>
+                  {mobError}
+                </Text>
+              )}
+            </Box>
+          )}
+        </Box>
       </Box>
     </Box>
   );

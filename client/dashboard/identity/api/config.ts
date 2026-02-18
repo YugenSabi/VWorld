@@ -6,6 +6,8 @@ export const API_CONFIG = {
 export const API_ENDPOINTS = {
   agents: {
     list: '/agents',
+    presets: '/agents/presets',
+    spawnPreset: '/agents/presets/spawn',
     byId: (id: string) => `/agents/${id}`,
     profile: (id: string) => `/agents/${id}/profile`,
     relationships: (id: string) => `/agents/${id}/relationships`,
@@ -13,6 +15,8 @@ export const API_ENDPOINTS = {
     update: (id: string) => `/agents/${id}`,
     delete: (id: string) => `/agents/${id}`,
     mood: (id: string) => `/agents/${id}/mood`,
+    mobPresets: '/agents/mobs/presets',
+    spawnMob: '/agents/mobs/spawn',
   },
 
   memory: {

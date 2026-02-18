@@ -25,7 +25,19 @@
       "entitiesLoadError": "Failed to load entities",
       "deleteButton": "DELETE",
       "deleteSubmitting": "DELETING...",
-      "deleteUnknownError": "Failed to delete hero"
+      "deleteUnknownError": "Failed to delete hero",
+      "presetsTitle": "READY HEROES",
+      "presetsLoading": "Loading presets...",
+      "presetsEmpty": "No presets for this weather",
+      "presetSpawnButton": "SPAWN",
+      "presetSpawnSubmitting": "SPAWNING...",
+      "presetSpawnError": "Failed to spawn preset",
+      "mobsPresetsTitle": "ANIMALS",
+      "mobsLoading": "Loading...",
+      "mobsEmpty": "No animals available",
+      "mobSpawnButton": "SPAWN",
+      "mobSpawnSubmitting": "SPAWNING...",
+      "mobSpawnError": "Failed to spawn animal"
     },
     "viewport": {
       "locationName": "WHISPERING VILLAGE",

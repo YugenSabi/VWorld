@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+﻿from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from ...websocket.agents_hub import agents_hub
 
@@ -13,7 +13,6 @@ async def agents_websocket(websocket: WebSocket):
 
     try:
         while True:
-            # Keep the connection alive; we currently don't expect client commands.
             await websocket.receive_text()
     except WebSocketDisconnect:
         agents_hub.disconnect(websocket)

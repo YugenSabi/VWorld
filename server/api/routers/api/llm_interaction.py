@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+﻿from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -13,7 +13,6 @@ from ... import models
 router = APIRouter(tags=["llm"])
 
 
-# ─── Request models ───
 
 class PlanRequest(BaseModel):
     goals: str = ""
@@ -37,7 +36,6 @@ class WorldEventRequest(BaseModel):
     event: str
 
 
-# ─── Agent-level endpoints ───
 
 @router.post("/agents/{agent_id}/plan")
 async def generate_plan(
@@ -54,7 +52,6 @@ async def generate_plan(
     brain = AgentBrain(agent_id, db)
     result = brain.generate_plan()
 
-    # Broadcast mood change via WebSocket
     background_tasks.add_task(
         agents_hub.send_agent_mood_changed, agent_id, agent.mood
     )
@@ -79,12 +76,9 @@ async def send_message(
     if not to_agent:
         raise HTTPException(status_code=404, detail="Target agent not found")
 
-    # agent_id sends message to to_agent_id
-    # AgentBrain of the RECEIVER processes the message
     brain = AgentBrain(request.to_agent_id, db)
     result = brain.respond_to_message(agent_id, request.message)
 
-    # Broadcast mood updates for both agents
     db.refresh(agent)
     db.refresh(to_agent)
     background_tasks.add_task(
@@ -113,7 +107,6 @@ async def react_to_event(
     brain = AgentBrain(agent_id, db)
     result = brain.react_to_event(request.event)
 
-    # Broadcast mood change
     db.refresh(agent)
     background_tasks.add_task(
         agents_hub.send_agent_mood_changed, agent_id, agent.mood
@@ -142,7 +135,6 @@ async def start_chat(
     brain = AgentBrain(agent_id, db)
     result = brain.start_chat(request.target_agent_id, request.topic)
 
-    # Broadcast mood updates for both agents
     db.refresh(agent)
     db.refresh(target)
     background_tasks.add_task(
@@ -172,7 +164,6 @@ async def summarize_agent_memories(
     return result
 
 
-# ─── World-level endpoints ───
 
 @router.post("/world/tick")
 async def world_tick(
@@ -197,7 +188,6 @@ async def world_tick(
                 "error": str(e),
             })
 
-    # Broadcast full update after tick
     background_tasks.add_task(agents_hub.send_agents_update)
 
     return {"tick_results": results}
@@ -214,7 +204,6 @@ async def world_event(
     if not agents:
         return {"reactions": [], "message": "No agents in the world"}
 
-    # Save event to DB
     create_event(db, models.EventCreate(content=request.event))
 
     reactions = []
@@ -230,7 +219,6 @@ async def world_event(
                 "error": str(e),
             })
 
-    # Broadcast full update
     background_tasks.add_task(agents_hub.send_agents_update)
 
     return {"event": request.event, "reactions": reactions}

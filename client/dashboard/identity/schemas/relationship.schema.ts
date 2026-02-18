@@ -1,36 +1,36 @@
 import { z } from 'zod';
 
-export const RelationshipTypeSchema = z.enum([
-  'Friend',
-  'Enemy',
-  'Family',
-  'Acquaintance',
-  'Stranger',
-  'Lover',
-]);
-
 export const RelationshipSchema = z.object({
-  id: z.string(),
-  fromAgentId: z.string(),
-  toAgentId: z.string(),
-  type: RelationshipTypeSchema,
-  strength: z.number().min(0).max(100),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  id: z.number().int(),
+  agent_from_id: z.number().int(),
+  agent_to_id: z.number().int(),
+  sympathy: z.number().int(),
 });
 
 export const RelationshipCreateSchema = z.object({
-  fromAgentId: z.string(),
-  toAgentId: z.string(),
-  type: RelationshipTypeSchema,
-  strength: z.number().min(0).max(100).default(50),
+  agent_from_id: z.number().int(),
+  agent_to_id: z.number().int(),
+  sympathy: z.number().int().min(-10).max(10),
 });
 
-export const GetRelationshipsResponseSchema = z.object({
-  relationships: z.array(RelationshipSchema),
+export const RelationshipGraphNodeSchema = z.object({
+  id: z.number().int(),
+  name: z.string(),
+});
+
+export const RelationshipGraphEdgeSchema = z.object({
+  from_id: z.number().int(),
+  to_id: z.number().int(),
+  sympathy: z.number().int(),
+});
+
+export const RelationshipGraphSchema = z.object({
+  nodes: z.array(RelationshipGraphNodeSchema),
+  edges: z.array(RelationshipGraphEdgeSchema),
 });
 
 export type Relationship = z.infer<typeof RelationshipSchema>;
-export type RelationshipType = z.infer<typeof RelationshipTypeSchema>;
 export type RelationshipCreate = z.infer<typeof RelationshipCreateSchema>;
-export type GetRelationshipsResponse = z.infer<typeof GetRelationshipsResponseSchema>;
+export type RelationshipGraphNode = z.infer<typeof RelationshipGraphNodeSchema>;
+export type RelationshipGraphEdge = z.infer<typeof RelationshipGraphEdgeSchema>;
+export type RelationshipGraph = z.infer<typeof RelationshipGraphSchema>;

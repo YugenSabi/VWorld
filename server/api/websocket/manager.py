@@ -1,4 +1,4 @@
-from fastapi import WebSocket
+﻿from fastapi import WebSocket
 from typing import Dict, Set
 import json
 import random
@@ -13,7 +13,6 @@ from api.database.crud_points import (
     update_point_target
 )
 
-# Скорость движения точки
 POINT_DEFAULT_SPEED = 1.5
 
 
@@ -25,7 +24,6 @@ class ConnectionManager:
         self._load_points_from_db()
     
     def _load_points_from_db(self):
-        #загружает точки из базы данных
         db = next(get_db())
         try:
             db_points = get_all_points(db)
@@ -38,7 +36,6 @@ class ConnectionManager:
                     "target_y": db_point.target_y,
                     "speed": db_point.speed
                 }
-                # считаем сколько точек, чтобы не было конфликтов ID
                 if db_point.id.startswith("point_"):
                     try:
                         counter = int(db_point.id.split("_")[1])
@@ -57,11 +54,9 @@ class ConnectionManager:
         self.active_connections.discard(websocket)
     
     def add_point(self, x: float, y: float) -> str:
-        #добавляет новую точку и возвращает её ID
         point_id = f"point_{self.point_counter}"
         self.point_counter += 1
         
-        # Начальная позиция в центре, небольшая случайная цель для движения
         radius = 30
         angle = random.uniform(0, 2 * math.pi)
         target_x = x + radius * math.cos(angle)
@@ -76,7 +71,6 @@ class ConnectionManager:
             "speed": POINT_DEFAULT_SPEED
         }
         
-        # Сохраняем точку в БД
         db = next(get_db())
         try:
             create_point(db, point_id, x, y, target_x, target_y, POINT_DEFAULT_SPEED)
@@ -86,12 +80,10 @@ class ConnectionManager:
         return point_id
     
     def move_point_to(self, point_id: str, target_x: float, target_y: float):
-        #устанавливает новую цель для точки
         if point_id in self.points:
             self.points[point_id]["target_x"] = target_x
             self.points[point_id]["target_y"] = target_y
             
-            # Обновляем цель в БД
             db = next(get_db())
             try:
                 update_point_target(db, point_id, target_x, target_y)
@@ -103,7 +95,6 @@ class ConnectionManager:
         self._load_points_from_db()
 
     async def broadcast_points(self):
-        #отправляет текущее состояние всех точек всем подключенным клиентам (без speed)
         if not self.active_connections:
             return
         

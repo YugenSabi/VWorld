@@ -21,6 +21,7 @@ export const CharacterPanelComponent = ({
   deletedAgentId = null,
 }: CharacterPanelProps) => {
   const t = useTranslations('game.characters');
+  const [activeTab, setActiveTab] = useState<'agents' | 'mobs'>('agents');
 
   const { agents: apiAgents, isLoading, error, refetch } = useAgents();
   const initialAgents = USE_MOCK_AGENTS ? MOCK_AGENTS : apiAgents;
@@ -74,6 +75,10 @@ export const CharacterPanelComponent = ({
     enabled: !USE_MOCK_AGENTS,
   });
 
+  const agentEntities = agents.filter((agent) => (agent.type || 'agent') === 'agent');
+  const mobEntities = agents.filter((agent) => (agent.type || 'agent') === 'mob');
+  const visibleEntities = activeTab === 'agents' ? agentEntities : mobEntities;
+
   return (
     <Box as='aside' width={210} flexDirection='column' gap={8}>
       <Box paddingBottom={6} borderBottom='2px solid #2a2a4a'>
@@ -87,6 +92,29 @@ export const CharacterPanelComponent = ({
         >
           {t('title')}
         </Text>
+      </Box>
+
+      <Box alignItems='center' gap={6}>
+        <Box
+          onClick={() => setActiveTab('agents')}
+          padding='4px 7px'
+          border='1px solid #2a2a4a'
+          background={activeTab === 'agents' ? 'rgba(42, 60, 102, 0.8)' : 'rgba(18, 25, 42, 0.8)'}
+        >
+          <Text as='span' color='$textGold' font='$pixel' fontSize='0.52rem'>
+            Characters
+          </Text>
+        </Box>
+        <Box
+          onClick={() => setActiveTab('mobs')}
+          padding='4px 7px'
+          border='1px solid #2a2a4a'
+          background={activeTab === 'mobs' ? 'rgba(42, 60, 102, 0.8)' : 'rgba(18, 25, 42, 0.8)'}
+        >
+          <Text as='span' color='$textGold' font='$pixel' fontSize='0.52rem'>
+            Animals
+          </Text>
+        </Box>
       </Box>
 
       <Box flexDirection='column' gap={6}>
@@ -104,17 +132,18 @@ export const CharacterPanelComponent = ({
 
         {!isLoading &&
           !error &&
-          agents.map((agent) => (
+          visibleEntities.map((agent) => (
             <CharacterCardComponent
               key={agent.id}
               name={agent.name}
               mood={agent.mood}
+              type={agent.type}
             />
           ))}
 
-        {!isLoading && !error && agents.length === 0 && (
+        {!isLoading && !error && visibleEntities.length === 0 && (
           <Text as='div' color='$textMuted' font='$pixel' fontSize='0.6rem' textAlign='center'>
-            No characters
+            {activeTab === 'agents' ? 'No characters' : 'No animals'}
           </Text>
         )}
       </Box>

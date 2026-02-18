@@ -3,10 +3,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Box } from '@ui/layout';
 import { Text } from '@ui/text';
+import char1Idle from '@shared/characters/char_1/beadwork-cross-stitch-pixel-art-pattern-people-dance-d2d7111f4ce5dc01915ceb14d47243a8.png';
+import char2Idle from '@shared/characters/char_2/—Pngtree—pixel beauty_4758536.png';
+import char3Idle from '@shared/characters/char_3/—Pngtree—pixel art character young boy_7325574.png';
+import mob1 from '@shared/mobs/mob_1/cat-minecraft-anime-manga-color-by-number-pixel-art-coloring-bead-husky-dog-f7401d42da5ac56d0bcfabdcae54f435.png';
+import mob2 from '@shared/mobs/mob_2/pixel-art-drawing-pixelation-dog-dog-952116381da75340b19b023c73ef8bcd.png';
+import mob3 from '@shared/mobs/mob_3/cat-kitten-pixel-art-cat-1aff464dfe4364a01019b92731bf5252.png';
 
 export interface AgentOnMap {
   id: number;
   name: string;
+  type?: string;
   x: number;
   y: number;
   mood: string;
@@ -30,6 +37,23 @@ const AGENT_COLORS = [
 
 function getAgentColor(id: number): string {
   return AGENT_COLORS[id % AGENT_COLORS.length];
+}
+
+function resolveSprite(agent: AgentOnMap): string {
+  if ((agent.type || 'agent') === 'mob') {
+    const mobSprites = [
+      (mob1 as { src: string }).src,
+      (mob2 as { src: string }).src,
+      (mob3 as { src: string }).src,
+    ];
+    return mobSprites[agent.id % mobSprites.length];
+  }
+  const agentSprites = [
+    (char1Idle as { src: string }).src,
+    (char2Idle as { src: string }).src,
+    (char3Idle as { src: string }).src,
+  ];
+  return agentSprites[agent.id % agentSprites.length];
 }
 
 /* ── Single Agent on Map ── */
@@ -124,13 +148,27 @@ function AgentSprite({ agent }: { agent: AgentOnMap }) {
         {agent.name}
       </Text>
 
-      {/* Agent body (colored square) */}
+      {/* Agent body */}
       <Box
-        width={20}
-        height={20}
-        backgroundColor={color}
-        border={`2px solid ${color}88`}
+        width={26}
+        height={26}
+        border={`1px solid ${color}88`}
         boxShadow={`0 0 8px ${color}66`}
+        overflow='hidden'
+        backgroundColor='rgba(0,0,0,0.35)'
+      />
+      <img
+        src={resolveSprite(agent)}
+        alt={agent.name}
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          width: 26,
+          height: 26,
+          objectFit: 'cover',
+          imageRendering: 'pixelated',
+          filter: (agent.type || 'agent') === 'mob' ? 'saturate(1.05)' : 'none',
+        }}
       />
     </Box>
   );

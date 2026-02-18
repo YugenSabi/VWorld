@@ -1,4 +1,4 @@
-"""Pydantic schemas for API requests and responses."""
+﻿"""Pydantic schemas for API requests and responses."""
 
 from .agents import (
     AgentBase,

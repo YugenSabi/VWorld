@@ -1,0 +1,1 @@
+export { DialoguePanelComponent } from './component';

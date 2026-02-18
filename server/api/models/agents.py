@@ -1,5 +1,5 @@
-from datetime import datetime
-from typing import Optional
+﻿from datetime import datetime
+from typing import Literal, Optional
 from pydantic import BaseModel
 
 from .memory import MemoryResponse
@@ -7,20 +7,18 @@ from .relationships import RelationshipResponse
 
 
 class AgentBase(BaseModel):
-    #базовый класс для агента
     name: str
+    type: str = "agent"
     personality: str = ""
     mood: str = "neutral"
     current_plan: str = ""
 
 
 class AgentCreate(AgentBase):
-    #создает нового агента
     pass
 
 
 class AgentUpdate(BaseModel):
-    #обновляет данные агента
     name: Optional[str] = None
     personality: Optional[str] = None
     mood: Optional[str] = None
@@ -28,7 +26,6 @@ class AgentUpdate(BaseModel):
 
 
 class AgentResponse(AgentBase):
-    #возвращает данные агента
     id: int
     x: float = 50.0
     y: float = 50.0
@@ -45,6 +42,7 @@ class AgentResponse(AgentBase):
         return cls(
             id=agent.id,
             name=agent.name,
+            type=getattr(agent, 'type', 'agent') or 'agent',
             personality=agent.personality,
             mood=agent.mood,
             current_plan=agent.current_plan,
@@ -55,15 +53,41 @@ class AgentResponse(AgentBase):
 
 
 class AgentProfileCharacter(BaseModel):
-    #информация о персонаже агента
     personality: str
     mood: str
     current_plan: str
 
 
 class AgentProfile(BaseModel):
-    #полный профиль агента с памятью и отношениями
     agent: AgentResponse
     character: AgentProfileCharacter
     memories: list[MemoryResponse]
     relationships: list[RelationshipResponse]
+
+
+WeatherType = Literal["sunny", "rainy", "cloudy", "snowy", "foggy", "stormy"]
+
+
+class AgentPreset(BaseModel):
+    id: str
+    name: str
+    personality: str = ""
+    mood: str = "neutral"
+    current_plan: str = ""
+    weather_tags: list[WeatherType] = []
+
+
+class AgentPresetSpawnRequest(BaseModel):
+    preset_id: str
+
+
+class MobPreset(BaseModel):
+    id: str
+    name: str
+    personality: str = ""
+    mood: str = "neutral"
+    current_plan: str = ""
+
+
+class MobPresetSpawnRequest(BaseModel):
+    preset_id: str
