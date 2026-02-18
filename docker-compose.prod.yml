@@ -1,0 +1,29 @@
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: vworld-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server/vworld.db:/app/vworld.db
+      - ./server/api/vector_memory.db:/app/api/vector_memory.db
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: dashboard/identity/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://195.133.31.207
+        NEXT_PUBLIC_WS_URL: wss://195.133.31.207
+    container_name: vworld-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=https://REPLACE_WITH_API_URL
+      - NEXT_PUBLIC_WS_URL=wss://REPLACE_WITH_WS_URL
+    depends_on:
+      - backend
+    restart: unless-stopped

@@ -107,8 +107,13 @@ export const HomeComponent = () => {
             />
           </Box>
 
-          <Box width='min(960px, 55vw)'>
-            <DialoguePanelComponent />
+          <Box width='min(960px, 55vw)' gap={12} height={190} alignItems='stretch'>
+            <Box flexGrow={1} flexBasis={0} minWidth={0}>
+              <DialoguePanelComponent />
+            </Box>
+            <Box flexGrow={1} flexBasis={0} minWidth={0}>
+              <EventLogComponent logs={worldLogs} />
+            </Box>
           </Box>
         </Box>
 
@@ -116,7 +121,6 @@ export const HomeComponent = () => {
           <CharacterPanelComponent refreshSignal={agentsRefreshSignal} deletedAgentId={deletedAgentId} />
           <RelationshipsGraphComponent />
           <CommunicationsGraphComponent />
-          <EventLogComponent logs={worldLogs} />
         </Box>
       </Box>
     </Box>

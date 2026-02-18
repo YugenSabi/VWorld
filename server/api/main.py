@@ -34,7 +34,6 @@ from .routers.ws.points import manager
 
 
 def _clear_world_memory():
-    """Очищает память, события, отношения и планы агентов при каждом старте."""
     import sqlite3
     import os
 
@@ -48,7 +47,6 @@ def _clear_world_memory():
     finally:
         db.close()
 
-    # Очищаем векторную память
     vector_db_path = os.path.join(os.path.dirname(__file__), "vector_memory.db")
     if os.path.exists(vector_db_path):
         try:
@@ -59,7 +57,6 @@ def _clear_world_memory():
         except Exception:
             pass
 
-    # Сбрасываем in-memory синглтон хранилища
     import api.llm.memory_store as ms
     ms._store_instance = None
 

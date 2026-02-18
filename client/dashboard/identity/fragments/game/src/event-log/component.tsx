@@ -27,8 +27,9 @@ export const EventLogComponent = ({ logs }: EventLogProps) => {
     <Box
       flexDirection='column'
       gap={0}
-      width={230}
-      maxHeight={340}
+      width='$full'
+      minHeight={150}
+      maxHeight={190}
       overflow='hidden'
       background='linear-gradient(180deg, #10182b 0%, #0a1020 100%)'
       border='2px solid #2e3f66'

@@ -78,7 +78,7 @@ export const CharacterPanelComponent = ({
   const visibleEntities = activeTab === 'agents' ? agentEntities : mobEntities;
 
   return (
-    <Box as='aside' width={210} flexDirection='column' gap={8}>
+    <Box as='aside' width={210} flexDirection='column' gap={8} height={137} overflow='hidden'>
       <Box paddingBottom={6} borderBottom='2px solid #2a2a4a'>
         <Text
           as='span'
@@ -115,7 +115,7 @@ export const CharacterPanelComponent = ({
         </Box>
       </Box>
 
-      <Box flexDirection='column' gap={6}>
+      <Box flexDirection='column' gap={6} flexGrow={1} minHeight={0} overflow='auto' paddingRight={2}>
         {isLoading && (
           <Text as='div' color='$textMuted' font='$pixel' fontSize='0.6rem' textAlign='center'>
             Loading...

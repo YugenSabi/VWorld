@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box } from '@ui/layout';
 import { Text } from '@ui/text';
 import char1Idle from '@shared/characters/char_1/beadwork-cross-stitch-pixel-art-pattern-people-dance-d2d7111f4ce5dc01915ceb14d47243a8.png';
-import char2Idle from '@shared/characters/char_2/—Pngtree—pixel beauty_4758536.png';
-import char3Idle from '@shared/characters/char_3/—Pngtree—pixel art character young boy_7325574.png';
+import char2Idle from '@shared/characters/char_2/char2.png';
+import char3Idle from '@shared/characters/char_3/char3.png';
 import mob1 from '@shared/mobs/mob_1/cat-minecraft-anime-manga-color-by-number-pixel-art-coloring-bead-husky-dog-f7401d42da5ac56d0bcfabdcae54f435.png';
 import mob2 from '@shared/mobs/mob_2/pixel-art-drawing-pixelation-dog-dog-952116381da75340b19b023c73ef8bcd.png';
 import mob3 from '@shared/mobs/mob_3/cat-kitten-pixel-art-cat-1aff464dfe4364a01019b92731bf5252.png';
@@ -22,6 +22,8 @@ export interface AgentOnMap {
 
 interface PlayersComponentProps {
   agents?: AgentOnMap[];
+  inspectedAgentId?: number | null;
+  onInspectAgent?: (agentId: number) => void;
 }
 
 const AGENT_COLORS = [
@@ -41,12 +43,27 @@ function getAgentColor(id: number): string {
 
 function resolveSprite(agent: AgentOnMap): string {
   if ((agent.type || 'agent') === 'mob') {
-    const mobSprites = [
-      (mob1 as { src: string }).src,
-      (mob2 as { src: string }).src,
-      (mob3 as { src: string }).src,
-    ];
-    return mobSprites[agent.id % mobSprites.length];
+    const normalized = (agent.name || '').toLowerCase().trim();
+    if (normalized.includes('murka') || normalized.includes('cat')) {
+      return (mob3 as { src: string }).src;
+    }
+    if (normalized.includes('buddy') || normalized.includes('dog')) {
+      return (mob2 as { src: string }).src;
+    }
+    if (normalized.includes('chizh') || normalized.includes('bird')) {
+      return (mob1 as { src: string }).src;
+    }
+    return (mob1 as { src: string }).src;
+  }
+  const normalized = (agent.name || '').toLowerCase().trim();
+  if (normalized.includes('mira')) {
+    return (char1Idle as { src: string }).src;
+  }
+  if (normalized.includes('dorian')) {
+    return (char2Idle as { src: string }).src;
+  }
+  if (normalized.includes('lyra')) {
+    return (char3Idle as { src: string }).src;
   }
   const agentSprites = [
     (char1Idle as { src: string }).src,
@@ -56,9 +73,18 @@ function resolveSprite(agent: AgentOnMap): string {
   return agentSprites[agent.id % agentSprites.length];
 }
 
-function AgentSprite({ agent }: { agent: AgentOnMap }) {
+function AgentSprite({
+  agent,
+  isInspected,
+  onInspect,
+}: {
+  agent: AgentOnMap;
+  isInspected: boolean;
+  onInspect?: (agentId: number) => void;
+}) {
   const color = getAgentColor(agent.id);
   const [ready, setReady] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setReady(true));
@@ -74,10 +100,13 @@ function AgentSprite({ agent }: { agent: AgentOnMap }) {
       flexDirection='column'
       alignItems='center'
       style={{
-        pointerEvents: 'none',
+        pointerEvents: 'auto',
         zIndex: 10,
         transition: ready ? 'left 0.45s linear, top 0.45s linear' : 'none',
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={() => onInspect?.(agent.id)}
     >
       {agent.bubble && (
         <Box
@@ -144,6 +173,9 @@ function AgentSprite({ agent }: { agent: AgentOnMap }) {
           objectFit: 'cover',
           imageRendering: 'pixelated',
           filter: (agent.type || 'agent') === 'mob' ? 'saturate(1.05)' : 'none',
+          border: isHovered || isInspected ? '2px solid #ffffff' : '2px solid transparent',
+          boxShadow: isHovered || isInspected ? '0 0 10px rgba(255,255,255,0.9)' : 'none',
+          cursor: 'pointer',
         }}
       />
     </Box>
@@ -151,13 +183,18 @@ function AgentSprite({ agent }: { agent: AgentOnMap }) {
 }
 
 
-export const PlayerComponent = ({ agents = [] }: PlayersComponentProps) => {
+export const PlayerComponent = ({ agents = [], inspectedAgentId = null, onInspectAgent }: PlayersComponentProps) => {
   if (agents.length === 0) return null;
 
   return (
     <>
       {agents.map((agent) => (
-        <AgentSprite key={agent.id} agent={agent} />
+        <AgentSprite
+          key={agent.id}
+          agent={agent}
+          isInspected={agent.id === inspectedAgentId}
+          onInspect={onInspectAgent}
+        />
       ))}
 
       <style>{`

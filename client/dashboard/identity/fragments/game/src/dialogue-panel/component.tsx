@@ -76,17 +76,22 @@ export const DialoguePanelComponent = () => {
   return (
     <Box
       flexDirection='column'
-      gap={8}
-      padding='12px 14px'
-      background='linear-gradient(180deg, rgba(10, 16, 32, 0.94) 0%, rgba(8, 12, 24, 0.94) 100%)'
+      gap={0}
+      background='linear-gradient(180deg, #10182b 0%, #0a1020 100%)'
       border='2px solid #2e3f66'
       boxShadow='0 12px 28px rgba(0, 0, 0, 0.45)'
       minHeight={150}
       maxHeight={190}
       overflow='hidden'
     >
-      <Box alignItems='center' justifyContent='space-between'>
-        <Text as='span' color='$textGold' font='$pixel' fontSize='0.68rem' letterSpacing='1px'>
+      <Box
+        padding='14px 16px'
+        borderBottom='1px solid #2e3f66'
+        alignItems='center'
+        justifyContent='space-between'
+        background='linear-gradient(180deg, rgba(28, 42, 71, 0.75) 0%, rgba(16, 24, 43, 0.65) 100%)'
+      >
+        <Text as='span' color='$textGold' font='$pixel' fontSize='0.7rem' letterSpacing='1px'>
           LIVE DIALOGUES
         </Text>
         <Text as='span' color='$textMuted' font='$pixel' fontSize='0.5rem'>
@@ -94,7 +99,15 @@ export const DialoguePanelComponent = () => {
         </Text>
       </Box>
 
-      <Box className='dialogue-feed-scroll' flexDirection='column' gap={8} overflow='auto' flexGrow={1} paddingRight={2}>
+      <Box
+        className='dialogue-feed-scroll'
+        flexDirection='column'
+        gap={8}
+        overflow='auto'
+        flexGrow={1}
+        padding='12px 14px'
+        paddingRight={2}
+      >
         {entries.length === 0 && (
           <Text as='div' color='$textMuted' font='$pixel' fontSize='0.56rem'>
             Dialogues will appear after agents react and talk.
@@ -104,7 +117,7 @@ export const DialoguePanelComponent = () => {
         {entries.map((entry) => (
           <Box
             key={entry.id}
-            alignItems='center'
+            alignItems='flex-start'
             gap={8}
             padding='7px 9px'
             background='rgba(18, 30, 50, 0.76)'
@@ -123,8 +136,14 @@ export const DialoguePanelComponent = () => {
                 {entry.speaker.slice(0, 1).toUpperCase()}
               </Text>
             </Box>
-            <Box flexDirection='column' gap={2}>
-              <Text as='span' color='$textGold' font='$pixel' fontSize='0.56rem'>
+            <Box flexDirection='column' gap={2} flexGrow={1} minWidth={0}>
+              <Text
+                as='span'
+                color='$textGold'
+                font='$pixel'
+                fontSize='0.56rem'
+                style={{ whiteSpace: 'normal', wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+              >
                 {entry.target ? `${entry.speaker} -> ${entry.target}` : entry.speaker}
               </Text>
               <Text

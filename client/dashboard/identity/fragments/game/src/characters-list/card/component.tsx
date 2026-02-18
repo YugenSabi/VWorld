@@ -2,8 +2,8 @@ import { Box } from '@ui/layout';
 import { Text } from '@ui/text';
 import type { AgentMood } from '@/schemas';
 import char1Idle from '@shared/characters/char_1/beadwork-cross-stitch-pixel-art-pattern-people-dance-d2d7111f4ce5dc01915ceb14d47243a8.png';
-import char2Idle from '@shared/characters/char_2/—Pngtree—pixel beauty_4758536.png';
-import char3Idle from '@shared/characters/char_3/—Pngtree—pixel art character young boy_7325574.png';
+import char2Idle from '@shared/characters/char_2/char2.png';
+import char3Idle from '@shared/characters/char_3/char3.png';
 import mob1 from '@shared/mobs/mob_1/cat-minecraft-anime-manga-color-by-number-pixel-art-coloring-bead-husky-dog-f7401d42da5ac56d0bcfabdcae54f435.png';
 import mob2 from '@shared/mobs/mob_2/pixel-art-drawing-pixelation-dog-dog-952116381da75340b19b023c73ef8bcd.png';
 import mob3 from '@shared/mobs/mob_3/cat-kitten-pixel-art-cat-1aff464dfe4364a01019b92731bf5252.png';
@@ -46,12 +46,27 @@ function formatMood(mood: string): string {
 
 function resolveAvatar(name: string, type?: string): string {
   if ((type || 'agent') === 'mob') {
-    const mobSprites = [
-      (mob1 as { src: string }).src,
-      (mob2 as { src: string }).src,
-      (mob3 as { src: string }).src,
-    ];
-    return mobSprites[name.length % mobSprites.length];
+    const normalized = (name || '').toLowerCase().trim();
+    if (normalized.includes('murka') || normalized.includes('cat')) {
+      return (mob3 as { src: string }).src;
+    }
+    if (normalized.includes('buddy') || normalized.includes('dog')) {
+      return (mob2 as { src: string }).src;
+    }
+    if (normalized.includes('chizh') || normalized.includes('bird')) {
+      return (mob1 as { src: string }).src;
+    }
+    return (mob1 as { src: string }).src;
+  }
+  const normalized = (name || '').toLowerCase().trim();
+  if (normalized.includes('mira')) {
+    return (char1Idle as { src: string }).src;
+  }
+  if (normalized.includes('dorian')) {
+    return (char2Idle as { src: string }).src;
+  }
+  if (normalized.includes('lyra')) {
+    return (char3Idle as { src: string }).src;
   }
   const agentSprites = [
     (char1Idle as { src: string }).src,
