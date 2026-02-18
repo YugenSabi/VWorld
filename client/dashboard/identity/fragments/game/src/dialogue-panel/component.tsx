@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import { Box } from '@ui/layout';
 import { Text } from '@ui/text';
 import { useRealtimeAgents } from '@/hooks';
-import { USE_MOCK_AGENTS } from '@/mocks';
+
 
 type DialogueEntry = {
   id: string;
@@ -70,7 +70,7 @@ export const DialoguePanelComponent = () => {
         }
       }
     },
-    enabled: !USE_MOCK_AGENTS,
+    enabled: true,
   });
 
   return (

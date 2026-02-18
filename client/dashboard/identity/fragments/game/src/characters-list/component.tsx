@@ -6,7 +6,6 @@ import { Text } from '@ui/text';
 import { CharacterCardComponent } from './card';
 import { useTranslations } from 'next-intl';
 import { useAgents, useRealtimeAgents } from '@/hooks';
-import { MOCK_AGENTS, USE_MOCK_AGENTS } from '@/mocks';
 import type { Agent } from '@/schemas';
 
 interface CharacterPanelProps {
@@ -24,16 +23,15 @@ export const CharacterPanelComponent = ({
   const [activeTab, setActiveTab] = useState<'agents' | 'mobs'>('agents');
 
   const { agents: apiAgents, isLoading, error, refetch } = useAgents();
-  const initialAgents = USE_MOCK_AGENTS ? MOCK_AGENTS : apiAgents;
 
-  const [agents, setAgents] = useState<Agent[]>(initialAgents);
-
-  useEffect(() => {
-    setAgents(initialAgents);
-  }, [initialAgents]);
+  const [agents, setAgents] = useState<Agent[]>(apiAgents);
 
   useEffect(() => {
-    if (!USE_MOCK_AGENTS && refreshSignal > 0) {
+    setAgents(apiAgents);
+  }, [apiAgents]);
+
+  useEffect(() => {
+    if (refreshSignal > 0) {
       refetch();
     }
   }, [refreshSignal, refetch]);
@@ -72,7 +70,7 @@ export const CharacterPanelComponent = ({
     onAgentCreated: handleAgentCreated,
     onAgentDeleted: handleAgentDeleted,
     onAgentMoodChanged: handleAgentMoodChanged,
-    enabled: !USE_MOCK_AGENTS,
+    enabled: true,
   });
 
   const agentEntities = agents.filter((agent) => (agent.type || 'agent') === 'agent');

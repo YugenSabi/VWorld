@@ -56,8 +56,6 @@ function resolveSprite(agent: AgentOnMap): string {
   return agentSprites[agent.id % agentSprites.length];
 }
 
-/* ── Single Agent on Map ── */
-
 function AgentSprite({ agent }: { agent: AgentOnMap }) {
   const color = getAgentColor(agent.id);
   const [ready, setReady] = useState(false);
@@ -81,7 +79,6 @@ function AgentSprite({ agent }: { agent: AgentOnMap }) {
         transition: ready ? 'left 0.45s linear, top 0.45s linear' : 'none',
       }}
     >
-      {/* Speech/thought bubble */}
       {agent.bubble && (
         <Box
           position='relative'
@@ -109,7 +106,6 @@ function AgentSprite({ agent }: { agent: AgentOnMap }) {
               ? agent.bubble.substring(0, 57) + '...'
               : agent.bubble}
           </Text>
-          {/* Bubble triangle */}
           <Box
             position='absolute'
             bottom={-5}
@@ -126,36 +122,25 @@ function AgentSprite({ agent }: { agent: AgentOnMap }) {
         </Box>
       )}
 
-      {/* Agent name */}
-      <Text
-        as='span'
-        color='#fff'
-        font='$pixel'
-        fontSize='0.42rem'
-        letterSpacing='0.5px'
-        textShadow='1px 1px 2px rgba(0,0,0,0.9)'
-        marginBottom={2}
+      <span
+        style={{
+          color: '#fff',
+          fontFamily: 'var(--ui-font-pixel, monospace)',
+          fontSize: '0.42rem',
+          letterSpacing: '0.5px',
+          textShadow: '1px 1px 2px rgba(0,0,0,0.9)',
+          marginBottom: 2,
+        }}
       >
         {agent.name}
-      </Text>
+      </span>
 
-      {/* Agent body */}
-      <Box
-        width={26}
-        height={26}
-        border={`1px solid ${color}88`}
-        boxShadow={`0 0 8px ${color}66`}
-        overflow='hidden'
-        backgroundColor='rgba(0,0,0,0.35)'
-      />
       <img
         src={resolveSprite(agent)}
         alt={agent.name}
         style={{
-          position: 'absolute',
-          bottom: 0,
-          width: 26,
-          height: 26,
+          width: 40,
+          height: 40,
           objectFit: 'cover',
           imageRendering: 'pixelated',
           filter: (agent.type || 'agent') === 'mob' ? 'saturate(1.05)' : 'none',
@@ -165,7 +150,6 @@ function AgentSprite({ agent }: { agent: AgentOnMap }) {
   );
 }
 
-/* ── All Players on Map ── */
 
 export const PlayerComponent = ({ agents = [] }: PlayersComponentProps) => {
   if (agents.length === 0) return null;
@@ -176,7 +160,6 @@ export const PlayerComponent = ({ agents = [] }: PlayersComponentProps) => {
         <AgentSprite key={agent.id} agent={agent} />
       ))}
 
-      {/* Bubble animation keyframes */}
       <style>{`
         @keyframes fadeInBubble {
           from { opacity: 0; transform: translateY(4px); }

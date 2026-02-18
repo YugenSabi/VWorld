@@ -12,9 +12,10 @@ import { PlayerComponent } from '../player';
 import type { AgentOnMap } from '../player';
 import { RainOverlay } from './rain';
 import { SnowOverlay } from './snow';
+import { ZoneOverlay } from './zone-overlay';
 import { useRealtimeAgents } from '@/hooks';
 import { useAgents } from '@/hooks';
-import { USE_MOCK_AGENTS } from '@/mocks';
+
 import { getWebSocketClient, WS_ENDPOINTS } from '@/api/websocket';
 
 type ViewportProps = {
@@ -48,7 +49,6 @@ export const ViewportComponent = ({ weather }: ViewportProps) => {
   }, [apiAgents]);
 
   useEffect(() => {
-    if (USE_MOCK_AGENTS) return;
     const client = getWebSocketClient(WS_ENDPOINTS.points);
     client.connect();
 
@@ -162,7 +162,7 @@ export const ViewportComponent = ({ weather }: ViewportProps) => {
         }, 2000);
       }
     },
-    enabled: !USE_MOCK_AGENTS,
+    enabled: true,
   });
 
   const agentsOnMap: AgentOnMap[] = agents.map((agent) => ({
@@ -242,6 +242,7 @@ export const ViewportComponent = ({ weather }: ViewportProps) => {
           style={{ objectFit: 'cover', imageRendering: 'pixelated' }}
         />
 
+        <ZoneOverlay />
         {weather === 'rainy' && <RainOverlay />}
         {weather === 'snowy' && <SnowOverlay />}
         <PlayerComponent agents={agentsOnMap} />

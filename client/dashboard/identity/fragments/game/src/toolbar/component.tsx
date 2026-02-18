@@ -65,6 +65,8 @@ export const ToolbarComponent = ({
   const [spawningMobId, setSpawningMobId] = useState<string | null>(null);
   const [entityError, setEntityError] = useState<string | null>(null);
   const [mobError, setMobError] = useState<string | null>(null);
+  const [newAgentName, setNewAgentName] = useState('');
+  const [isCreatingAgent, setIsCreatingAgent] = useState(false);
   const [entityAgents, setEntityAgents] = useState<Agent[]>([]);
   const [agentPresets, setAgentPresets] = useState<AgentPreset[]>([]);
   const [mobPresets, setMobPresets] = useState<MobPreset[]>([]);
@@ -163,6 +165,28 @@ export const ToolbarComponent = ({
     } finally {
       setIsSpawningMob(false);
       setSpawningMobId(null);
+    }
+  };
+
+  const handleCreateAgent = async () => {
+    const name = newAgentName.trim();
+    if (!name) return;
+    setEntityError(null);
+    setIsCreatingAgent(true);
+    try {
+      const response = await agentsService.createAgent({
+        name,
+        mood: 'neutral',
+        personality: '',
+        current_plan: '',
+      });
+      setEntityAgents((prev) => [...prev, response.agent]);
+      setNewAgentName('');
+      onAgentCreated();
+    } catch (error) {
+      setEntityError(error instanceof Error ? error.message : 'Failed to create agent');
+    } finally {
+      setIsCreatingAgent(false);
     }
   };
 
@@ -287,6 +311,46 @@ export const ToolbarComponent = ({
 
           {isEntityMenuOpen && (
             <Box flexDirection='column' gap={6} padding={6} background='rgba(18, 25, 42, 0.9)' border='1px solid #2a1204'>
+              <Box borderBottom='1px solid #2a2a4a' paddingBottom={6} flexDirection='column' gap={6}>
+                <Text as='div' color='$textMuted' font='$pixel' fontSize='0.58rem'>
+                  CREATE
+                </Text>
+                <input
+                  value={newAgentName}
+                  onChange={(e) => setNewAgentName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleCreateAgent(); }}
+                  placeholder='agent name...'
+                  maxLength={100}
+                  style={{
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    height: 28,
+                    padding: '4px 8px',
+                    border: '1px solid #5a3a18',
+                    background: '#0d1220',
+                    color: '#f4d88d',
+                    fontFamily: 'var(--ui-font-pixel, monospace)',
+                    fontSize: '11px',
+                    outline: 'none',
+                  }}
+                />
+                <Button
+                  fullWidth
+                  size='sm'
+                  variant='outline'
+                  radius='sm'
+                  font='$pixel'
+                  fontSize='0.62rem'
+                  textColor='$textGold'
+                  bg='$buttonBg'
+                  borderColor='$border'
+                  onClick={handleCreateAgent}
+                  disabled={isCreatingAgent || !newAgentName.trim()}
+                >
+                  {isCreatingAgent ? '...' : '+ CREATE'}
+                </Button>
+              </Box>
+
               <Box borderBottom='1px solid #2a2a4a' paddingBottom={6} flexDirection='column' gap={6}>
                 <Text as='div' color='$textMuted' font='$pixel' fontSize='0.58rem'>
                   {tToolbar('presetsTitle')}

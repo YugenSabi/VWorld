@@ -4,6 +4,7 @@ import {
   forwardRef,
   CSSProperties,
   ReactElement,
+  MouseEventHandler,
   cloneElement,
   isValidElement,
   type Ref,
@@ -26,7 +27,7 @@ const ICON_SLOT: Record<'sm' | 'md' | 'lg', number> = {
   lg: 40,
 };
 
-export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
+export const Button = forwardRef<HTMLElement, ButtonProps>(
   (
     {
       size = 'md',
@@ -103,7 +104,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
         width: iconSize,
         height: iconSize,
         ...(icon.props || {}),
-      });
+      } as any);
     };
 
     const content = (
@@ -121,6 +122,8 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
     if (type === 'link') {
       const { href, target, rel, onClick, ...rest } = props as ButtonProps & {
         href: string;
+        target?: string;
+        rel?: string;
       };
 
       const linkRel = target === '_blank' && !rel ? 'noopener noreferrer' : rel;
@@ -131,14 +134,14 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
           href={href}
           target={target}
           rel={linkRel}
-          onClick={onClick}
+          onClick={onClick as unknown as MouseEventHandler<HTMLAnchorElement>}
           style={{
             ...buttonStyles,
             pointerEvents: disabled ? 'none' : buttonStyles.pointerEvents,
           }}
           aria-disabled={disabled}
           tabIndex={disabled ? -1 : undefined}
-          {...rest}
+          {...(rest as any)}
         >
           {content}
         </a>
@@ -151,7 +154,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
         type={type ?? 'button'}
         disabled={disabled}
         style={buttonStyles}
-        {...props}
+        {...(props as any)}
       >
         {content}
       </button>
