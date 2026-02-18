@@ -4,6 +4,7 @@ import random
 import time
 
 from .agent_ai import AgentBrain
+from .zones import PRIMARY_ZONES
 from .. import models
 from ..database.crud_agents import get_agents
 from ..database.crud_relationships import upsert_relationship
@@ -12,14 +13,36 @@ from ..database.models import Relationship
 from ..websocket.agents_hub import agents_hub
 
 
+_PLAN_ZONE_KEYWORDS: dict[str, list[str]] = {
+    "park": ["отдых", "парк", "спокой", "прогулк", "тихо", "расслаб"],
+    "square": ["площадь", "встреч", "люди", "контакт", "знаком", "общени"],
+    "road": ["маршрут", "дорог", "движени", "безопасност", "координац", "темп"],
+}
+
+
+def _pick_zone_for_plan(plan_text: str) -> str | None:
+    if not plan_text:
+        return None
+    lower = plan_text.lower()
+    scores: dict[str, int] = {name: 0 for name in _PLAN_ZONE_KEYWORDS}
+    for zone_name, keywords in _PLAN_ZONE_KEYWORDS.items():
+        for kw in keywords:
+            if kw in lower:
+                scores[zone_name] += 1
+    best = max(scores, key=lambda k: scores[k])
+    if scores[best] == 0:
+        return random.choice([z.name for z in PRIMARY_ZONES])
+    return best
+
+
 def _run_agent_plan(agent_id: int):
     db = SessionLocal()
     try:
         brain = AgentBrain(agent_id, db)
         plan = brain.generate_plan()
-        return {"agent_id": agent_id, "plan": plan, "mood": brain.agent.mood, "error": None}
+        return {"agent_id": agent_id, "plan": plan, "mood": brain.agent.mood, "point_id": brain.agent.point_id, "error": None}
     except Exception as e:
-        return {"agent_id": agent_id, "plan": None, "mood": None, "error": str(e)}
+        return {"agent_id": agent_id, "plan": None, "mood": None, "point_id": None, "error": str(e)}
     finally:
         db.close()
 
@@ -213,6 +236,15 @@ class SimulationLoop:
 
                 if plan_result["mood"] is not None:
                     await agents_hub.send_agent_mood_changed(agent.id, plan_result["mood"])
+
+                point_id = plan_result.get("point_id")
+                plan_text = plan.get("plan", "") if isinstance(plan, dict) else str(plan)
+                if point_id and plan_text:
+                    dest_zone = _pick_zone_for_plan(plan_text)
+                    if dest_zone:
+                        from ..routers.ws.points import manager as points_manager
+                        from ..websocket.ws_logic import steer_agent_to_zone
+                        steer_agent_to_zone(points_manager, point_id, dest_zone)
 
             db.expire_all()
             all_entities = get_agents(db)

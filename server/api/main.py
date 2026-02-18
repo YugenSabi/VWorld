@@ -11,6 +11,7 @@ from .database import init_db
 from .database.database import SessionLocal
 from .database.crud_environment import get_environment
 from .database.crud_events import create_event, get_events
+from .database.models import Memory, Event, Relationship, Agent
 from .llm.simulation import get_simulation
 from .websocket.ws_logic import points_update_task
 from . import models
@@ -32,9 +33,41 @@ from .routers.ws import points_router, agents_router
 from .routers.ws.points import manager
 
 
+def _clear_world_memory():
+    """Очищает память, события, отношения и планы агентов при каждом старте."""
+    import sqlite3
+    import os
+
+    db = SessionLocal()
+    try:
+        db.query(Memory).delete()
+        db.query(Event).delete()
+        db.query(Relationship).delete()
+        db.query(Agent).update({"current_plan": ""})
+        db.commit()
+    finally:
+        db.close()
+
+    # Очищаем векторную память
+    vector_db_path = os.path.join(os.path.dirname(__file__), "vector_memory.db")
+    if os.path.exists(vector_db_path):
+        try:
+            con = sqlite3.connect(vector_db_path)
+            con.execute("DELETE FROM vector_memories")
+            con.commit()
+            con.close()
+        except Exception:
+            pass
+
+    # Сбрасываем in-memory синглтон хранилища
+    import api.llm.memory_store as ms
+    ms._store_instance = None
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    _clear_world_memory()
 
     points_task = asyncio.create_task(points_update_task(manager))
 
@@ -43,6 +76,7 @@ async def lifespan(app: FastAPI):
     try:
         env = get_environment(db)
         sim.set_speed(env.time_speed)
+        manager.time_speed = env.time_speed
         existing_events = get_events(db, limit=1)
         if not existing_events:
             create_event(

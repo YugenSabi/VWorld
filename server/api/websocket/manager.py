@@ -19,8 +19,9 @@ POINT_DEFAULT_SPEED = 1.5
 class ConnectionManager:
     def __init__(self):
         self.active_connections: Set[WebSocket] = set()
-        self.points: Dict[str, dict] = {}  # {point_id: {x, y, target_x, target_y, speed}}
+        self.points: Dict[str, dict] = {}
         self.point_counter = 0
+        self.time_speed: float = 1.0
         self._load_points_from_db()
     
     def _load_points_from_db(self):
@@ -91,8 +92,25 @@ class ConnectionManager:
                 db.close()
     
     def reload_from_db(self):
-        """Reload points from DB (called when agents are created/deleted)."""
-        self._load_points_from_db()
+        db = next(get_db())
+        try:
+            db_points = get_all_points(db)
+            for db_point in db_points:
+                if db_point.id not in self.points:
+                    self.points[db_point.id] = {
+                        "id": db_point.id,
+                        "x": db_point.x,
+                        "y": db_point.y,
+                        "target_x": db_point.target_x,
+                        "target_y": db_point.target_y,
+                        "speed": db_point.speed,
+                    }
+            alive_ids = {p.id for p in db_points}
+            for point_id in list(self.points.keys()):
+                if point_id not in alive_ids:
+                    del self.points[point_id]
+        finally:
+            db.close()
 
     async def broadcast_points(self):
         if not self.active_connections:
@@ -104,7 +122,7 @@ class ConnectionManager:
         ]
         message = json.dumps({
             "type": "points_update",
-            "points": points_for_client
+            "data": {"points": points_for_client}
         })
         
         disconnected = set()

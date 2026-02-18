@@ -18,7 +18,7 @@ ROAD_ZONES: list[tuple[float, float, float, float]] = [
 ]
 
 
-def _nearest_road_point(x: float, y: float) -> tuple[float, float]:
+def _clamp_to_zone(x: float, y: float) -> tuple[float, float]:
     best_x, best_y = x, y
     best_dist = float("inf")
     for x1, y1, x2, y2 in ROAD_ZONES:
@@ -31,6 +31,30 @@ def _nearest_road_point(x: float, y: float) -> tuple[float, float]:
     return best_x, best_y
 
 
+def _random_target_in_zone(x: float, y: float, radius: float) -> tuple[float, float]:
+    for _ in range(16):
+        angle = random.uniform(0, 2 * math.pi)
+        tx = x + radius * math.cos(angle)
+        ty = y + radius * math.sin(angle)
+        for x1, y1, x2, y2 in ROAD_ZONES:
+            if x1 <= tx <= x2 and y1 <= ty <= y2:
+                return tx, ty
+    return _clamp_to_zone(x + radius * math.cos(random.uniform(0, 2 * math.pi)),
+                          y + radius * math.sin(random.uniform(0, 2 * math.pi)))
+
+
+def steer_agent_to_zone(manager, point_id: str, zone_name: str) -> bool:
+    from api.llm.zones import get_zone_by_name
+    zone = get_zone_by_name(zone_name)
+    if zone is None or point_id not in manager.points:
+        return False
+    tx = random.uniform(zone.x1 + 1, zone.x2 - 1)
+    ty = random.uniform(zone.y1 + 1, zone.y2 - 1)
+    manager.points[point_id]["target_x"] = tx
+    manager.points[point_id]["target_y"] = ty
+    return True
+
+
 def _refresh_point_agent_map(db: Session):
     global _point_to_agent
     agents = get_agents(db, limit=1000)
@@ -40,7 +64,7 @@ def _refresh_point_agent_map(db: Session):
 def update_points(manager):
     db = next(get_db())
     try:
-        for point_id, point in manager.points.items():
+        for point_id, point in list(manager.points.items()):
             old_x = point["x"]
             old_y = point["y"]
 
@@ -50,20 +74,15 @@ def update_points(manager):
 
             target_changed = False
             if distance > 0.5:
-                move_distance = min(point["speed"], distance)
+                move_distance = min(point["speed"] * manager.time_speed, distance)
                 point["x"] += (dx / distance) * move_distance
                 point["y"] += (dy / distance) * move_distance
             else:
                 radius = 2.8 if point_id.startswith("agent_point_") else 4.2
-                angle = random.uniform(0, 2 * math.pi)
                 old_target_x = point["target_x"]
                 old_target_y = point["target_y"]
-                next_target_x = point["x"] + radius * math.cos(angle)
-                next_target_y = point["y"] + radius * math.sin(angle)
-                point["target_x"], point["target_y"] = _nearest_road_point(next_target_x, next_target_y)
+                point["target_x"], point["target_y"] = _random_target_in_zone(point["x"], point["y"], radius)
                 target_changed = (point["target_x"] != old_target_x or point["target_y"] != old_target_y)
-
-            point["x"], point["y"] = _nearest_road_point(point["x"], point["y"])
 
             position_changed = abs(point["x"] - old_x) > 0.1 or abs(point["y"] - old_y) > 0.1
             if position_changed or target_changed:
@@ -98,7 +117,7 @@ async def points_update_task(manager):
 
         _broadcast_counter += 1
         if _broadcast_counter % 10 == 0:
-            for point_id, point in manager.points.items():
+            for point_id, point in list(manager.points.items()):
                 agent_id = _point_to_agent.get(point_id)
                 if agent_id is not None:
                     await agents_hub.send_agent_moved(agent_id, point["x"], point["y"])

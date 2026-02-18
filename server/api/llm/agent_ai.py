@@ -2,6 +2,7 @@
 
 from .config import get_llm, get_embedding_model
 from .memory_store import get_memory_store
+from .zones import get_zone_label
 from .emotions import (
     parse_mood,
     mood_to_json,
@@ -47,6 +48,12 @@ class AgentBrain:
         self.memory_store = get_memory_store()
         self.agent = get_agent(db, agent_id)
 
+    def _get_current_zone_label(self) -> str:
+        point = getattr(self.agent, "point", None)
+        if point:
+            return get_zone_label(point.x, point.y)
+        return "неизвестная зона"
+
     def _get_system_prompt(self) -> str:
         mood = parse_mood(self.agent.mood)
         return SYSTEM_PROMPT.format(
@@ -54,6 +61,7 @@ class AgentBrain:
             personality=self.agent.personality,
             mood_description=mood_description(mood),
             mood_style=mood_to_style(mood),
+            current_zone=self._get_current_zone_label(),
         )
 
     @staticmethod
@@ -62,7 +70,7 @@ class AgentBrain:
             return True
         return text.startswith("[GenAPI error") or text.startswith("[Gemini error")
 
-    def _build_heuristic_plan(self, weather: str, events_text: str, relationships_text: str) -> str:
+    def _build_heuristic_plan(self, weather: str, events_text: str, relationships_text: str, current_zone: str = "") -> str:
         weather = (weather or "sunny").lower()
         weather_line = {
             "rainy": "Держаться рядом с укрытиями и чаще сверять обстановку с другими.",
@@ -72,6 +80,14 @@ class AgentBrain:
             "stormy": "Сфокусироваться на безопасности и координации команды.",
             "sunny": "Активнее выходить к людям и поддерживать живой диалог.",
         }.get(weather, "Действовать спокойно и по ситуации.")
+        zone_line = ""
+        if current_zone and current_zone != "неизвестная зона":
+            zone_hints = {
+                "парк": "Ты в парке — хорошее место для спокойного разговора и отдыха.",
+                "дорога": "Ты на дороге — держи ритм движения, смотри по сторонам.",
+                "площадь": "Ты на площади — здесь много людей, можно встретить кого-то знакомого.",
+            }
+            zone_line = zone_hints.get(current_zone, f"Ты сейчас находишься: {current_zone}.")
         social_line = "Поддерживать отношения: быть дружелюбнее к союзникам и осторожнее с конфликтными контактами."
         if "hostile" in events_text.lower() or "removed" in events_text.lower():
             social_line = "Учесть недавние конфликты и бережно перестроить общение с окружающими."
@@ -80,7 +96,11 @@ class AgentBrain:
         if "враг" in relationships_text.lower():
             social_line = "Избегать эскалации с недоброжелателями и искать нейтральный тон там, где это возможно."
         mood_line = "Оставаться в роли, говорить коротко и по делу, реагировать на реальную обстановку."
-        return f"{weather_line}\n{social_line}\n{mood_line}"
+        parts = [weather_line]
+        if zone_line:
+            parts.append(zone_line)
+        parts += [social_line, mood_line]
+        return "\n".join(parts)
 
     @staticmethod
     def _clean_chat_text(text: str) -> str:
@@ -324,16 +344,17 @@ class AgentBrain:
         env = get_environment(self.db)
         from ..database.crud_events import get_events
         events = get_events(self.db, limit=5)
-        events_text = "\n".join([f"- {e.content}" for e in events]) if events else "РќРёС‡РµРіРѕ РѕСЃРѕР±РµРЅРЅРѕРіРѕ."
-        memories_text = self._get_relevant_memories("РїР»Р°РЅ РґРµР№СЃС‚РІРёСЏ С‡С‚Рѕ РґРµР»Р°С‚СЊ")
+        events_text = "\n".join([f"- {e.content}" for e in events]) if events else "Ничего особенного."
+        memories_text = self._get_relevant_memories("план действия что делать")
         relationships_text = self._get_relationships_text()
+        current_zone = self._get_current_zone_label()
 
-        response = self._build_heuristic_plan(env.weather, events_text, relationships_text)
+        response = self._build_heuristic_plan(env.weather, events_text, relationships_text, current_zone)
 
         self.agent.current_plan = response
         self.db.commit()
-        self._save_memory(f"РЇ СЂРµС€РёР»: {response}", memory_type="plan")
-        new_mood = self._update_mood(f"РЎРѕСЃС‚Р°РІРёР» РїР»Р°РЅ: {response}")
+        self._save_memory(f"Я решил: {response}", memory_type="plan")
+        new_mood = self._update_mood(f"Составил план: {response}")
 
         return {
             "agent_id": self.agent_id,
@@ -364,6 +385,7 @@ class AgentBrain:
             speaker_name=from_agent.name,
             message=message,
             weather=env.weather,
+            current_zone=self._get_current_zone_label(),
             sympathy=sympathy,
             sympathy_hint=get_sympathy_hint(sympathy),
             past_conversations=past,
@@ -446,6 +468,7 @@ class AgentBrain:
             target_name=target.name,
             topic_context=topic_context,
             weather=env.weather,
+            current_zone=self._get_current_zone_label(),
             sympathy=sympathy,
             sympathy_hint=get_sympathy_hint(sympathy),
         )

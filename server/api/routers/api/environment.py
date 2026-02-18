@@ -77,10 +77,17 @@ def add_environment_event(event: EnvironmentEventCreate, db: Session = Depends(g
 
 
 @router.patch("/speed", response_model=models.EnvironmentResponse)
-def update_time_speed(speed: TimeSpeedUpdate, db: Session = Depends(get_db)):
+def update_time_speed(
+    speed: TimeSpeedUpdate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    from ...routers.ws.points import manager as points_manager
     env = crud_update_time_speed(db, speed.speed)
     get_simulation().set_speed(env.time_speed)
+    points_manager.time_speed = env.time_speed
     create_event(db, models.EventCreate(content=f"Time speed changed to: {env.time_speed}x"))
+    background_tasks.add_task(agents_hub.broadcast, "time_speed_changed", {"speed": env.time_speed})
     return models.EnvironmentResponse(weather=env.weather, speed=env.time_speed)
 
 

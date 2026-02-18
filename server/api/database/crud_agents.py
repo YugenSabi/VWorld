@@ -17,17 +17,16 @@ def _random_road_point() -> tuple[float, float]:
     return random.uniform(x1, x2), random.uniform(y1, y2)
 
 
-def _nearest_road_point(x: float, y: float) -> tuple[float, float]:
-    best_x, best_y = x, y
-    best_dist = float("inf")
-    for x1, y1, x2, y2 in ROAD_ZONES:
-        cx = max(x1, min(x2, x))
-        cy = max(y1, min(y2, y))
-        dist = (cx - x) ** 2 + (cy - y) ** 2
-        if dist < best_dist:
-            best_dist = dist
-            best_x, best_y = cx, cy
-    return best_x, best_y
+def _random_target_in_zone(x: float, y: float, radius: float) -> tuple[float, float]:
+    for _ in range(16):
+        angle = random.uniform(0, 2 * math.pi)
+        tx = x + radius * math.cos(angle)
+        ty = y + radius * math.sin(angle)
+        for x1, y1, x2, y2 in ROAD_ZONES:
+            if x1 <= tx <= x2 and y1 <= ty <= y2:
+                return tx, ty
+    x1, y1, x2, y2 = ROAD_ZONES[0]
+    return random.uniform(x1, x2), random.uniform(y1, y2)
 
 
 def get_agents(db: Session, skip: int = 0, limit: int = 100) -> list[Agent]:
@@ -54,15 +53,10 @@ def _next_point_id(db: Session) -> str:
 
 def create_agent(db: Session, agent: models.AgentCreate) -> Agent:
     x, y = _random_road_point()
-
-    radius = 2.8  # % units
-    angle = random.uniform(0, 2 * math.pi)
-    target_x = x + radius * math.cos(angle)
-    target_y = y + radius * math.sin(angle)
-    target_x, target_y = _nearest_road_point(target_x, target_y)
+    target_x, target_y = _random_target_in_zone(x, y, 2.8)
 
     point_id = _next_point_id(db)
-    create_point(db, point_id, x, y, target_x, target_y, speed=0.14)
+    create_point(db, point_id, x, y, target_x, target_y, speed=0.24)
 
     db_agent = Agent(
         name=agent.name,

@@ -29,6 +29,7 @@ class AgentResponse(AgentBase):
     id: int
     x: float = 50.0
     y: float = 50.0
+    point_id: Optional[str] = None
     created_at: datetime
 
     class Config:
@@ -36,7 +37,6 @@ class AgentResponse(AgentBase):
 
     @classmethod
     def from_agent(cls, agent) -> "AgentResponse":
-        """Create response with position from linked Point."""
         x = agent.point.x if agent.point else 50.0
         y = agent.point.y if agent.point else 50.0
         return cls(
@@ -48,6 +48,7 @@ class AgentResponse(AgentBase):
             current_plan=agent.current_plan,
             x=x,
             y=y,
+            point_id=agent.point_id,
             created_at=agent.created_at,
         )
 
