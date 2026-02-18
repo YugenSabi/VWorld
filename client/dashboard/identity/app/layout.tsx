@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { pressStart2PFont } from '@ui/theme/tokens/fonts.next';
+import { pressStart2PFont } from '@ui/theme/src/tokens/fonts.next';
 import { NextIntlClientProvider } from 'next-intl';
 import './globals.css';
 import messages from '../entrypoints/locales/ru.json';

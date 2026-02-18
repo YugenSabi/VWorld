@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: vworld-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server/vworld.db:/app/vworld.db
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: dashboard/identity/Dockerfile
+    container_name: vworld-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped

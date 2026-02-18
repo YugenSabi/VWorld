@@ -1,2 +1,2 @@
 export { PlayerComponent } from './component';
-export type { PlayerData, PlayerPosition } from './interface';
+export type { AgentOnMap } from './component';

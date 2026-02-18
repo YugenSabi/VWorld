@@ -1,5 +1,4 @@
-#модели для базы данных
-
+﻿
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, CheckConstraint
 from sqlalchemy.orm import relationship
@@ -12,11 +11,14 @@ class Agent(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
+    type = Column(String, default="agent", nullable=False)
     personality = Column(String, default="")
     mood = Column(String, default="neutral")
     current_plan = Column(String, default="")
+    point_id = Column(String, ForeignKey("points.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    point = relationship("Point", lazy="joined")
     memories = relationship("Memory", back_populates="agent", cascade="all, delete-orphan")
     relationships_from = relationship(
         "Relationship",
@@ -78,10 +80,10 @@ class Environment(Base):
 
 
 class Point(Base):
-    """Модель для хранения точек на canvas."""
+    """РњРѕРґРµР»СЊ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ С‚РѕС‡РµРє РЅР° canvas."""
     __tablename__ = "points"
 
-    id = Column(String, primary_key=True, index=True)  # point_id типа "point_0", "point_1"
+    id = Column(String, primary_key=True, index=True)  # point_id С‚РёРїР° "point_0", "point_1"
     x = Column(Float, nullable=False)
     y = Column(Float, nullable=False)
     target_x = Column(Float, nullable=False)

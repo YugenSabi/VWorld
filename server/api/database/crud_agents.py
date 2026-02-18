@@ -1,27 +1,70 @@
+﻿import random
+import math
 from typing import Optional
 from sqlalchemy.orm import Session
 
-from .models import Agent
+from .models import Agent, Point
+from .crud_points import create_point, delete_point
 from .. import models
+
+ROAD_ZONES: list[tuple[float, float, float, float]] = [
+    (34.0, 44.0, 68.0, 66.0),
+]
+
+
+def _random_road_point() -> tuple[float, float]:
+    x1, y1, x2, y2 = random.choice(ROAD_ZONES)
+    return random.uniform(x1, x2), random.uniform(y1, y2)
+
+
+def _random_target_in_zone(x: float, y: float, radius: float) -> tuple[float, float]:
+    for _ in range(16):
+        angle = random.uniform(0, 2 * math.pi)
+        tx = x + radius * math.cos(angle)
+        ty = y + radius * math.sin(angle)
+        for x1, y1, x2, y2 in ROAD_ZONES:
+            if x1 <= tx <= x2 and y1 <= ty <= y2:
+                return tx, ty
+    x1, y1, x2, y2 = ROAD_ZONES[0]
+    return random.uniform(x1, x2), random.uniform(y1, y2)
 
 
 def get_agents(db: Session, skip: int = 0, limit: int = 100) -> list[Agent]:
-    #возвращает все агента с пагинацией
     return db.query(Agent).offset(skip).limit(limit).all()
 
 
 def get_agent(db: Session, agent_id: int) -> Optional[Agent]:
-    #возвращает конкретного агента по id
     return db.query(Agent).filter(Agent.id == agent_id).first()
 
 
+def _next_point_id(db: Session) -> str:
+    """Generate next point_id like 'agent_point_0', 'agent_point_1', etc."""
+    existing = db.query(Point).filter(Point.id.like("agent_point_%")).all()
+    max_counter = -1
+    for p in existing:
+        try:
+            counter = int(p.id.split("agent_point_")[1])
+            if counter > max_counter:
+                max_counter = counter
+        except (ValueError, IndexError):
+            pass
+    return f"agent_point_{max_counter + 1}"
+
+
 def create_agent(db: Session, agent: models.AgentCreate) -> Agent:
-    #создает нового агента
+    x, y = _random_road_point()
+    target_x, target_y = _random_target_in_zone(x, y, 2.8)
+
+    point_id = _next_point_id(db)
+    create_point(db, point_id, x, y, target_x, target_y, speed=0.24)
+
     db_agent = Agent(
         name=agent.name,
+        type=getattr(agent, 'type', 'agent'),
         personality=agent.personality,
         mood=agent.mood,
         current_plan=agent.current_plan,
+        point_id=point_id,
     )
     db.add(db_agent)
     db.commit()
@@ -30,7 +73,6 @@ def create_agent(db: Session, agent: models.AgentCreate) -> Agent:
 
 
 def update_agent(db: Session, agent_id: int, agent: models.AgentUpdate) -> Optional[Agent]:
-    #обновляет данные агента
     db_agent = get_agent(db, agent_id)
     if not db_agent:
         return None
@@ -43,23 +85,23 @@ def update_agent(db: Session, agent_id: int, agent: models.AgentUpdate) -> Optio
 
 
 def delete_agent(db: Session, agent_id: int) -> bool:
-    #удаляет агента по id
     db_agent = get_agent(db, agent_id)
     if not db_agent:
         return False
+    if db_agent.point_id:
+        delete_point(db, db_agent.point_id)
     db.delete(db_agent)
     db.commit()
     return True
 
 
 def get_agent_profile(db: Session, agent_id: int) -> Optional[models.AgentProfile]:
-    #возвращает профиль агента с памятью и отношениями
     db_agent = get_agent(db, agent_id)
     if not db_agent:
         return None
 
     from .models import Memory, Relationship
-    
+
     memories = db.query(Memory).filter(Memory.agent_id == agent_id).order_by(Memory.created_at.desc()).all()
     relationships = (
         db.query(Relationship)

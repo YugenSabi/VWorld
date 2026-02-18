@@ -1,14 +1,12 @@
-from datetime import datetime
+﻿from datetime import datetime
 from pydantic import BaseModel
 
 
 class MemoryCreate(BaseModel):
-    #создает новую память
     content: str
 
 
 class MemoryResponse(BaseModel):
-    #возвращает данные памяти
     id: int
     agent_id: int
     content: str
@@ -19,6 +17,5 @@ class MemoryResponse(BaseModel):
 
 
 class MemoryWithSummary(BaseModel):
-    #возвращает память с суммарией
     memories: list[MemoryResponse]
     summary: str
