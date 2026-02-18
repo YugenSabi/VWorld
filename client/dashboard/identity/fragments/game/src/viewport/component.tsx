@@ -15,6 +15,7 @@ import { SnowOverlay } from './snow';
 import { useRealtimeAgents } from '@/hooks';
 import { useAgents } from '@/hooks';
 import { USE_MOCK_AGENTS } from '@/mocks';
+import { getWebSocketClient, WS_ENDPOINTS } from '@/api/websocket';
 
 type ViewportProps = {
   weather: WeatherType;
@@ -28,17 +29,50 @@ export const ViewportComponent = ({ weather }: ViewportProps) => {
   const [bubbles, setBubbles] = useState<Record<number, string>>({});
   const [agents, setAgents] = useState<Agent[]>([]);
   const bubbleTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const pointToAgent = useRef<Record<string, number>>({});
 
   useEffect(() => {
     if (apiAgents && apiAgents.length > 0) {
       setAgents(apiAgents);
       const initPos: Record<number, { x: number; y: number }> = {};
+      const map: Record<string, number> = {};
       for (const a of apiAgents) {
         initPos[a.id] = { x: (a as any).x ?? 50, y: (a as any).y ?? 50 };
+        if ((a as any).point_id) {
+          map[(a as any).point_id] = a.id;
+        }
       }
       setPositions(initPos);
+      pointToAgent.current = map;
     }
   }, [apiAgents]);
+
+  useEffect(() => {
+    if (USE_MOCK_AGENTS) return;
+    const client = getWebSocketClient(WS_ENDPOINTS.points);
+    client.connect();
+
+    const unsub = client.on<{ points: { id: string; x: number; y: number }[] }>(
+      'points_update' as any,
+      (data) => {
+        if (!data?.points) return;
+        setPositions((prev) => {
+          const next = { ...prev };
+          for (const p of data.points) {
+            const agentId = pointToAgent.current[p.id];
+            if (agentId !== undefined) {
+              next[agentId] = { x: p.x, y: p.y };
+            }
+          }
+          return next;
+        });
+      }
+    );
+
+    return () => {
+      unsub();
+    };
+  }, []);
 
   const showBubble = useCallback((agentId: number, text: string, durationMs = 6000) => {
     setBubbles((prev) => ({ ...prev, [agentId]: text }));
@@ -56,11 +90,22 @@ export const ViewportComponent = ({ weather }: ViewportProps) => {
 
   const handleAgentsUpdate = useCallback((updatedAgents: Agent[]) => {
     setAgents(updatedAgents);
-    const newPos: Record<number, { x: number; y: number }> = {};
+    const map: Record<string, number> = {};
     for (const a of updatedAgents) {
-      newPos[a.id] = { x: (a as any).x ?? 50, y: (a as any).y ?? 50 };
+      if ((a as any).point_id) {
+        map[(a as any).point_id] = a.id;
+      }
     }
-    setPositions((prev) => ({ ...prev, ...newPos }));
+    pointToAgent.current = map;
+    setPositions((prev) => {
+      const next = { ...prev };
+      for (const a of updatedAgents) {
+        if (next[a.id] === undefined) {
+          next[a.id] = { x: (a as any).x ?? 50, y: (a as any).y ?? 50 };
+        }
+      }
+      return next;
+    });
   }, []);
 
   const handleAgentCreated = useCallback((agent: Agent) => {
@@ -72,6 +117,9 @@ export const ViewportComponent = ({ weather }: ViewportProps) => {
       ...prev,
       [agent.id]: { x: (agent as any).x ?? 50, y: (agent as any).y ?? 50 },
     }));
+    if ((agent as any).point_id) {
+      pointToAgent.current[(agent as any).point_id] = agent.id;
+    }
   }, []);
 
   const handleAgentDeleted = useCallback((agentId: number) => {

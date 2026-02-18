@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box } from '@ui/layout';
 import { Text } from '@ui/text';
 import char1Idle from '@shared/characters/char_1/beadwork-cross-stitch-pixel-art-pattern-people-dance-d2d7111f4ce5dc01915ceb14d47243a8.png';
@@ -59,36 +59,27 @@ function resolveSprite(agent: AgentOnMap): string {
 /* ── Single Agent on Map ── */
 
 function AgentSprite({ agent }: { agent: AgentOnMap }) {
-  const [offsetX, setOffsetX] = useState(0);
-  const [direction, setDirection] = useState(1);
+  const color = getAgentColor(agent.id);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const step = 1;
-    const range = 4;
-    const interval = setInterval(() => {
-      setOffsetX((prev) => {
-        const next = prev + step * direction;
-        if (next >= range || next <= -range) {
-          setDirection((d) => d * -1);
-        }
-        return next;
-      });
-    }, 150 + (agent.id % 5) * 20);
-
-    return () => clearInterval(interval);
-  }, [direction, agent.id]);
-
-  const color = getAgentColor(agent.id);
+    const id = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   return (
     <Box
       position='absolute'
-      left={`calc(${agent.x}% + ${offsetX}px)`}
+      left={`${agent.x}%`}
       top={`${agent.y}%`}
       transform='translate(-50%, -50%)'
       flexDirection='column'
       alignItems='center'
-      style={{ pointerEvents: 'none', zIndex: 10 }}
+      style={{
+        pointerEvents: 'none',
+        zIndex: 10,
+        transition: ready ? 'left 0.45s linear, top 0.45s linear' : 'none',
+      }}
     >
       {/* Speech/thought bubble */}
       {agent.bubble && (

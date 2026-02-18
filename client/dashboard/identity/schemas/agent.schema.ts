@@ -11,6 +11,7 @@ export const AgentSchema = z.object({
   current_plan: z.string().default(''),
   x: z.number().default(50),
   y: z.number().default(50),
+  point_id: z.string().nullable().optional(),
   created_at: z.string(),
 });
 
