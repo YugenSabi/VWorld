@@ -15,7 +15,7 @@ import { RelationshipsGraphComponent } from '../relationships-graph';
 import { CommunicationsGraphComponent } from '../communications-graph';
 
 export const HomeComponent = () => {
-  const { weather, isLoading, setWeather } = useEnvironment();
+  const { weather, timeSpeed, isLoading, setWeather, setTimeSpeed } = useEnvironment();
   const [agentsRefreshSignal, setAgentsRefreshSignal] = useState(0);
   const [deletedAgentId, setDeletedAgentId] = useState<number | null>(null);
   const [eventsRefreshSignal, setEventsRefreshSignal] = useState(0);
@@ -79,8 +79,10 @@ export const HomeComponent = () => {
       <Box alignItems='flex-start' gap={16}>
         <ToolbarComponent
           weather={weather}
+          timeSpeed={timeSpeed}
           isLoading={isLoading}
           onWeatherChange={handleWeatherChange}
+          onTimeSpeedChange={setTimeSpeed}
           onAgentCreated={handleAgentCreated}
           onAgentDeleted={handleAgentDeleted}
         />

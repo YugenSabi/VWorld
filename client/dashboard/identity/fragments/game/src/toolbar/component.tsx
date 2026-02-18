@@ -9,11 +9,14 @@ import type { Agent, AgentPreset, MobPreset, WeatherType } from '../../../../sch
 import { useTranslations } from 'next-intl';
 
 const weatherOptions: WeatherType[] = ['sunny', 'rainy', 'snowy'];
+const speedOptions = [1, 2, 5];
 
 type ToolbarProps = {
   weather: WeatherType;
+  timeSpeed: number;
   isLoading: boolean;
   onWeatherChange: (weather: WeatherType) => Promise<void>;
+  onTimeSpeedChange: (speed: number) => Promise<void>;
   onAgentCreated: () => void;
   onAgentDeleted: (agentId: number) => void;
 };
@@ -38,8 +41,10 @@ function getWeatherLabel(t: ReturnType<typeof useTranslations>, weather: Weather
 
 export const ToolbarComponent = ({
   weather,
+  timeSpeed,
   isLoading,
   onWeatherChange,
+  onTimeSpeedChange,
   onAgentCreated,
   onAgentDeleted,
 }: ToolbarProps) => {
@@ -195,6 +200,31 @@ export const ToolbarComponent = ({
       </Box>
 
       <Box as='aside' flexDirection='column' gap={12}>
+        <Box flexDirection='column' gap={6}>
+          <Box flexDirection='row' flexWrap='wrap' gap={4} justifyContent='center'>
+            {speedOptions.map((speed) => {
+              const selected = timeSpeed === speed;
+              return (
+                <Button
+                  key={speed}
+                  size='sm'
+                  variant='outline'
+                  radius='sm'
+                  font='$pixel'
+                  fontSize='0.9rem'
+                  textColor={selected ? '$accentGreenLight' : '$textGold'}
+                  bg='$buttonBg'
+                  borderColor={selected ? '$accentGreenLight' : '$border'}
+                  disabled={selected || isLoading}
+                  onClick={() => onTimeSpeedChange(speed)}
+                >
+                  {speed}x
+                </Button>
+              );
+            })}
+          </Box>
+        </Box>
+
         <Box flexDirection='column' gap={6}>
           <Button
             fullWidth
